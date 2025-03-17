@@ -1,0 +1,225 @@
+import { Guides } from '@/components/Guides'
+import { Resources } from '@/components/Resources'
+import { HeroPattern } from '@/components/HeroPattern'
+
+export const metadata = {
+  title: 'API Documentation',
+  description:
+    'Learn everything there is to know about the Protocol API and integrate Protocol into your product.',
+}
+
+export const sections = [
+  { title: 'Guides', id: 'guides' },
+  { title: 'Resources', id: 'resources' },
+]
+
+<HeroPattern />
+
+# SMMS API Documentation
+
+The Safeguarding Mobile Money Services (SMMS) API enables centralized verification and status updates of mobile phone numbers. This documentation covers the two available endpoints: Phone Number Status Verification and Phone Number Status Update. It includes authentication guidance, response schemas, error handling, and best practices. {{ className: 'lead' }}
+
+{/* <div className="not-prose mt-6 mb-16 flex gap-3">
+  <Button href="/quickstart" arrow="right">
+    <>Quickstart</>
+  </Button>
+  <Button href="/sdks" variant="outline">
+    <>Explore SDKs</>
+  </Button>
+</div> */}
+
+## Authentication {{ anchor: false }}
+
+All API calls require API Key-based authentication. The API key must be included in the Authorization header for every request. {{ className: 'lead' }}
+
+<div className="not-prose">
+<Row>
+  <Col>
+    ```json {{ title: 'Example header' }}
+    { "Authorisation": "Bearer <token>" }
+    ```
+  </Col>
+</Row>
+</div>
+
+Tokens are provided to each registered entity during onboarding by the system administrator. {{ className: 'lead' }}
+
+## Glossary {{ anchor: false }}
+
+- **MSISDN:** Mobile Subscriber Integrated Services Digital Network Number (full phone number)
+- **Bearer Token:** Security token passed in headers for authorization 
+- **Active:** Phone number currently in use 
+- **Inactive:** Phone number not in use 
+- **Reassigned:** Phone number has been reissued to a new user 
+
+## Request/Response Schema Definitions {{ anchor: false }}
+
+Phone Number Status Update Request Schema: {{ className: 'lead' }}
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  "status": { 
+    "type": "string", 
+    "enum": ["Active", "Inactive", "Reassigned"], 
+    "required": true 
+  }
+} 
+```
+</CodeGroup>
+
+## Phone Number Verification Response Schema: {{ anchor: false }}
+
+<div className="mb-20">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  "msisdn": "string", 
+  "current_status": "string", 
+  "last_updated": "ISO date format (YYYY-MM-DD)" 
+}
+```
+</CodeGroup>
+</div>
+
+# API endpoints {{ className: 'mb-10'}}
+
+## Phone number status verification API
+
+Allows verification of a mobile number's current status before using it for onboarding or financial services. Endpoint: GET /api/v1/numbers/phoneNumber/verify {{ className: 'lead' }}
+
+## Path parameters
+
+phoneNumber: Full MSISDN (e.g., +2348001234567) {{ className: 'lead' }}
+
+<div className="mb-20">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+ "msisdn": "+2348001234567", 
+ "current_status": "Reassigned", 
+ "last_updated": "2025-03-01" 
+}
+```
+</CodeGroup>
+</div>
+
+## Sample Response: 
+
+<div className="mb-20">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  "msisdn": "+2348001234567", 
+  "current_status": "Reassigned", 
+  "last_updated": "2025-03-01" 
+}
+```
+</CodeGroup>
+</div>
+
+## Phone number status update API
+
+Allows authorized users to update the status of a phone number. {{ className: 'lead' }}
+
+- **Endpoint:** PATCH /api/v1/numbers/phoneNumber/status.
+- **Path Parameters:** - phoneNumber: Full MSISDN (e.g., +2348001234567).
+
+## Error handling
+
+SMMS uses standard HTTP status codes. Below are common responses. {{ className: 'lead' }}
+
+- 400 Bad Request: Missing or invalid parameter 
+- 401 Unauthorized: Missing or invalid API token 
+- 403 Forbidden: Insufficient permission 
+- 404 Not Found: Record not found 
+- 429 Too Many Requests: Rate limit exceeded 
+- 500 Internal Server Error: Unexpected error 
+
+<div className="mb-20">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  "error": { 
+    "code": 400, 
+    "message": "Missing required field: status", 
+    "details": "The 'status' field is required in the payload" 
+  }
+}
+```
+</CodeGroup>
+</div>
+
+### Common error scenarios
+
+<div>
+<table class="w-full border-collapse shadow-sm">
+    <thead>
+      <tr>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Code</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Scenario</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Suggested Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">400</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Missing status field</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Add required "status" key in payload</td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">401</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Authorization heading missing</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Include bearer token in header</td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">403</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Role not permitted</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Check user role permissions</td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">404</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Invalid phone number provided</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Verify number exists before request</td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">429</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Too many requests</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3">Wait and retry after backoff period</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Example use for case flow
+
+Scenario: A financial service provider wants to verify the phone number before onboarding a user. {{ className: 'lead' }}
+
+Step 1: Call the verification API with the phone number. {{className: 'lead'}}
+
+<div>
+<CodeGroup>
+
+```json {{ language: 'js' }}
+GET /api/v1/numbers/+2348001234567/verify
+```
+</CodeGroup>
+</div>
+
+Step 2: If status is 'Reassigned' or 'Inactive', halt onboarding process to prevent fraud. {{ className: 'lead' }}
+
+Step 3: If status is 'Active', proceed with onboarding. {{ className: 'lead' }}
+
+## Versioning and Support
+
+- API Version: v1.0 
+- For support contact: api-support@smms.ng
+
+
+{/* <Guides />
+
+<Resources /> */}
