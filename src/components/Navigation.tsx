@@ -231,7 +231,7 @@ function NavigationGroup({
 
 export const navigation: Array<NavGroup> = [
   {
-    title: 'Guide',
+    title: 'Documentation',
     links: [
       { title: 'API Documentation', href: '/' },
       // { title: 'Quickstart', href: '/quickstart' },
