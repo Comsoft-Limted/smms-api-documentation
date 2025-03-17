@@ -8,11 +8,6 @@ export const metadata = {
     'Learn everything there is to know about the Protocol API and integrate Protocol into your product.',
 }
 
-export const sections = [
-  { title: 'Guides', id: 'guides' },
-  { title: 'Resources', id: 'resources' },
-]
-
 <HeroPattern />
 
 # SMMS API Documentation
@@ -28,7 +23,7 @@ The Safeguarding Mobile Money Services (SMMS) API enables centralized verificati
   </Button>
 </div> */}
 
-## Authentication {{ anchor: false }}
+## Authentication
 
 All API calls require API Key-based authentication. The API key must be included in the Authorization header for every request. {{ className: 'lead' }}
 
@@ -44,7 +39,7 @@ All API calls require API Key-based authentication. The API key must be included
 
 Tokens are provided to each registered entity during onboarding by the system administrator. {{ className: 'lead' }}
 
-## Glossary {{ anchor: false }}
+## Glossary
 
 - **MSISDN:** Mobile Subscriber Integrated Services Digital Network Number (full phone number)
 - **Bearer Token:** Security token passed in headers for authorization 
@@ -52,7 +47,7 @@ Tokens are provided to each registered entity during onboarding by the system ad
 - **Inactive:** Phone number not in use 
 - **Reassigned:** Phone number has been reissued to a new user 
 
-## Request/Response Schema Definitions {{ anchor: false }}
+## Request/Response Schema Definitions
 
 Phone Number Status Update Request Schema: {{ className: 'lead' }}
 <CodeGroup>
@@ -68,7 +63,7 @@ Phone Number Status Update Request Schema: {{ className: 'lead' }}
 ```
 </CodeGroup>
 
-## Phone Number Verification Response Schema: {{ anchor: false }}
+## Phone Number Verification Response Schema:
 
 <div className="mb-20">
 <CodeGroup>
