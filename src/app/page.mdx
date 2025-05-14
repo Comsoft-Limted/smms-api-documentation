@@ -10,7 +10,42 @@ export const metadata = {
 
 <HeroPattern />
 
-# SMMS API Documentation
+# Prerequisite
+Before integrating with the SMMS API, ensure the following requirements are in place: {{ className: 'lead' }}
+
+## Onboarding and Registeration {{ className: 'mt-0'}}
+- Your organization must be registered and approved by the SMMS system administrator.
+- API access credentials (API key) will be issued upon successful onboarding.
+
+## API Key Generation {{ className: 'mt-0'}}
+
+- An administrator from your organization must log into the SMMS portal to generate an API key.
+- Keep this key secure; it will be used in the Authorization header for every API request.
+
+## Webhook Setup (for Bulk Verification) {{ className: 'mt-0'}}
+
+- If you intend to use the bulk verification endpoint, set up a secure and accessible webhook URL to receive asynchronous results. The webhook can be configured via the SMMS platform.
+
+## MSISDN Format Compliance {{ className: 'mt-0'}}
+
+- All phone numbers must be submitted in the 11-digit MSISDN format (e.g., 08012345678), based on the E.164 standard without the '+' symbol.
+
+## Network and Security Readiness {{ className: 'mt-0'}}
+
+- Ensure outbound HTTPS traffic is allowed from your system to the SMMS API endpoints.
+- Use secure HTTPS (TLS) communication at all times.
+
+## Development Environment Access {{ className: 'mt-0'}}
+
+- For testing, request access to the SMMS sandbox environment to simulate API requests and verify your integration.
+
+## Development Team Familiarity {{ className: 'mt-0'}}
+
+- Your developers should be familiar with RESTful API principles, JSON payload structures, and handling common HTTP status codes.
+
+
+
+# Introduction {{ className: 'mt-20'}}
 
 The Safeguarding Mobile Money Services (SMMS) API enables centralized verification and status updates of mobile phone numbers. This documentation covers the two available endpoints: Phone Number Status Verification and Phone Number Status Update. It includes authentication guidance, response schemas, error handling, and best practices. {{ className: 'lead' }}
 
@@ -23,7 +58,7 @@ The Safeguarding Mobile Money Services (SMMS) API enables centralized verificati
   </Button>
 </div>
 
-## Authentication
+# Authentication
 
 All API calls require API Key-based authentication. The API key must be included in the Authorization header for every request. 
 Admins can generate API keys for their accounts directly from the platform. {{ className: 'lead' }}
@@ -40,15 +75,18 @@ Admins can generate API keys for their accounts directly from the platform. {{ c
 
 Tokens are provided to each registered entity during onboarding by the system administrator. {{ className: 'lead' }}
 
-## Glossary
+# Glossary {{className: 'mb-5 mt-14'}}
 
-- **MSISDN:** Mobile Subscriber Integrated Services Digital Network Number (full phone number)
-- **Bearer Token:** Security token passed in headers for authorization 
-- **Active:** Phone number currently in use 
-- **Inactive:** Phone number not in use 
-- **Reassigned:** Phone number has been reissued to a new user 
+- **MSISDN:** Mobile Subscriber Integrated Services Digital Network Number (11 digits)
+- **API Key:** Security passed in headers for authorization 
+- **Reassigned Date:** The date the phone number was officially deactivated from its previous user and reallocated to a new user by the telecom operator.
+- **Churned:** Number has been recycled and/or reassigned due to dormancy
+- **Swapped:** Sim has been replaced due to loss/theft/damage 
+- **Blacklisted:** Number has been blocked/barred
+- **Null/Normal:** Number not in any of the above states
 
-## Request/Response Schema Definitions
+
+{/* ## Request/Response Schema Definitions
 
 Phone Number Status Update Request Schema: {{ className: 'lead' }}
 <CodeGroup>
@@ -77,11 +115,94 @@ Phone Number Status Update Request Schema: {{ className: 'lead' }}
 }
 ```
 </CodeGroup>
+</div> */}
+
+# API endpoints {{ className: 'mb-5 mt-10'}}
+
+## Phone Number Status Update Endpoint.
+
+Purpose: This endpoint allows telecom operators to update the status of a mobile phone number in the SMMS database. It ensures that service providers across platforms have access to the most current status—such as whether a number has been blacklisted, churned, swapped, or is valid (Null/Normal)—for risk mitigation and fraud prevention. {{ className: 'lead' }}
+
+<hr className='py-0'/>
+
+**When to Use:** {{className:'lead'}}
+- After phone number is   
+- Before initiating sensitive transactions.
+- Periodic checks to ensure ongoing validity of stored numbers.
+
+**Phone Number Status Update Request Schema:**
+<div className="mb-10">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+    "phoneNumber": "+2348001234567", 
+    "status": "Blacklisted, Churned, Null/Normal, Swapped", 
+    "remarks": "string" 
+}
+```
+</CodeGroup>
 </div>
 
-# API endpoints {{ className: 'mb-10'}}
+**Phone Number Status Update Response Schema:**
+<div className="mb-10">
+<CodeGroup>
 
-## Phone number status verification API
+```json {{ language: 'js' }}
+{ 
+    "status": "string",
+    "data": {
+      "phoneNumber": "string",
+      "status": "string",
+      "updateTimestamp": "2025-04-25T11:05:52.250Z",
+      "remarks": "string"
+    }
+}
+```
+</CodeGroup>
+</div>
+
+## Phone Number Status Update (bulk) Endpoint.
+Allows authorized users to update the status of multiple phone numbers. {{className: 'lead'}}
+
+**Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the SMMS system. For example, suppose several numbers become churned, swapped, or blacklisted.. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers. {{className:'lead'}}
+
+**Sample Request Payload**
+<div className="mb-10">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+   "updates": [
+    {
+      "phoneNumber": "string",
+      "status": "string",
+      "remarks": "string"
+    }
+  ]
+}
+```
+</CodeGroup>
+</div>
+
+**Sample Response**
+<div className="mb-10">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  {
+    "status": "string",
+    "data": "string",
+    "statusCode": "string"
+  }
+}
+```
+</CodeGroup>
+</div>
+
+
+## Phone Number Status Verification Endpoint
 
 **Purpose:** Before a service provider onboards a user or allows them to perform sensitive operations (like opening an account, initiating transactions, or resetting passwords), they should confirm that the phone number is safe to use. {{ className: 'lead' }}
 
@@ -95,29 +216,21 @@ When to Use: {{className:'lead'}}
 
 ## Process flow:
 
-1. Send a GET request with the phone number.
+1. Send a POST request with the phone number.
 2. The API returns the current status of the number:
-
-    - **Churned** → Safe to proceed.  
+    - **Churned** →  Stop the process; the number now belongs to a new user (potential fraud risk).
     - **Blacklisted** → Stop the process; the number is no longer in use.  
-    - **Swapped** → Stop the process; the number now belongs to a new user (potential fraud risk).  
-    - **Null/Normal** → Safe to proceed.
-
-Endpoint: GET /api/v1/numbers/&lt;phoneNumber&gt;/verify  {{ className:'lead' }}
+    - **Swapped** → Indicates that the SIM card associated with the phone number has been replaced—typically due to loss, theft, or damage. While the number may still belong to the same user, this status may warrant additional verification to ensure the user's identity and prevent potential misuse.  
+    - **Null/Normal** → Number either not found or does not exist i any of the states listed above.
 
 
-## Path parameters
-
-phoneNumber: Full MSISDN (e.g., +2348001234567) {{ className: 'lead' }}
-
-<div className="mb-20">
+## Sample Request
+<div className="mb-5">
 <CodeGroup>
 
 ```json {{ language: 'js' }}
 { 
-    "msisdn": "+2348001234567", 
-    "current_status": "Reassigned", 
-    "last_updated": "2025-03-01" 
+    "phoneNumber": "07444009986"
 }
 ```
 </CodeGroup>
@@ -130,64 +243,106 @@ phoneNumber: Full MSISDN (e.g., +2348001234567) {{ className: 'lead' }}
 
 ```json {{ language: 'js' }}
 { 
-    "msisdn": "+2348001234567", 
-    "current_status": "Reassigned", 
-    "last_updated": "2025-03-01" 
+  "status": "string",
+  "data": {
+    "status": "BLACKLISTED, CHURNED, REASSIGNED, SWAPPED, NORMAL, NULL",
+    "requestId": "string",
+    "reassignmentDate": "2025-04-30",
+    "verificationTimestamp": "2025-04-30T08:24:26.208Z",
+    "occurrenceOfStatusDate": "2025-04-30",
+    "mobileNetwork": "string",
+    "msisdn": "string"
+  },
 }
 ```
 </CodeGroup>
 </div>
 
-## Phone number status update API
+## Phone Number Status Verification (Bulk)
+**Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the SMMS system. For example, suppose several numbers become churned, swapped, blacklisted, or reassigned. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers. {{className: 'lead'}}
 
-Allows authorized users to update the status of a phone number. {{ className: 'lead' }}
-
-Purpose: This endpoint allows authorized operators (like Telcos or ) to update the status of a phone number in the SMMS system. 
-For example, when a Telco reallocates or deactivates a number, they must update the central system to maintain accuracy for service providers.
-
-## When to use:
-
-- When a number is churned 
-- When a number has been reassigned to a new customer.
-- After SIM swap events.
-- During periodic reconciliation of operator databases.
-
-## Process flow
-
-1. Send a PATCH request with the phone number and the new status.
-2. The system updates the record and returns a success message.
-
-## Important note
-
-Only authorized entities can update statuses. Attempts by unauthorized users will result in 403 Forbidden.
-
-**Endpoint**: PATCH /api/v1/numbers/{'phoneNumber'}/status.
-
-**Path Parameters:** - phoneNumber: Full MSISDN (e.g., +2348001234567).
-
+**Sample Request Payload**
 <div className="mb-10">
 <CodeGroup>
 
 ```json {{ language: 'js' }}
 { 
-    "status": "Inactive"
+ "updates": [
+    {
+      "phoneNumber": "string",
+      "status": "string",
+      "remarks": "string"
+    }
+  ]
 }
 ```
 </CodeGroup>
 </div>
 
+**Sample Response**
 <div className="mb-10">
 <CodeGroup>
 
 ```json {{ language: 'js' }}
 { 
-    "message": "Status updated successfully", 
+ "updates": [
+    {
+      "phoneNumber": "string",
+      "status": "string",
+      "remarks": "string"
+    }
+  ]
 }
 ```
 </CodeGroup>
-</div>  
+</div>
 
-## Error handling
+**Please note:** While the response payload will confirm whether the bulk request was successfully received, the actual status results for each phone number will be sent separately to the webhook provided by the requesting organization. See below for a sample phone number verification response that will be delivered to the webhook. {{className:'lead'}}
+
+<div className="mb-5">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+ "event": "phone.verification.failed",
+ "data": {
+    "status": "NOT_FOUND",
+    "requestId": "71c0d0b6-ad11-4a12-b86e-7f9db42ee4fc",
+    "reassignmentDate": null,
+    "verificationTimestamp": "2025-04-29 11:36:15",
+    "occurrenceOfStatusDate": null,
+    "mobileNetwork": "Mobile Network",
+    "msisdn": "08181855634"
+  },
+  "errorMessage": "Phone number record not found"
+}
+```
+</CodeGroup>
+</div>
+<div className="mb-10">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{
+  "event": "phone.verification.success",
+  "data": {
+    "status": "CHURNED",
+    "requestId": "388f0644-2dc3-43e4-8064-8162d1092abb",
+    "reassignmentDate": "2022-06-02",
+    "verificationTimestamp": "2025-04-30 08:50:00",
+    "occurrenceOfStatusDate": "2021-05-23",
+    "mobileNetwork": "Mobile Network",
+    "msisdn": "07076295624"
+  }
+}
+```
+</CodeGroup>
+</div>
+
+**Important Note:** <br/>
+Only authorized entities can update statuses. Attempts by unauthorized users will result in 403 Forbidden. {{className: 'lead'}}
+
+# Error handling
 
 SMMS uses standard HTTP status codes. Below are common responses. {{ className: 'lead' }}
 
@@ -204,9 +359,9 @@ SMMS uses standard HTTP status codes. Below are common responses. {{ className: 
 ```json {{ language: 'js' }}
 { 
   "error": { 
-      "code": 400, 
-      "message": "Missing required field: status", 
-      "details": "The 'status' field is required in the payload" 
+    "code": 400, 
+    "message": "Missing required field: status", 
+    "details": "The 'status' field is required in the payload" 
   }
 }
 ```
@@ -214,7 +369,6 @@ SMMS uses standard HTTP status codes. Below are common responses. {{ className: 
 </div>
 
 ### Common error scenarios
-
 <div>
   <table class="w-full border-collapse shadow-sm">
     <thead>
@@ -254,31 +408,40 @@ SMMS uses standard HTTP status codes. Below are common responses. {{ className: 
   </table>
 </div>
 
-## Example use for case flow
+# Security Considerations
+- All API calls must be over HTTPS.
+- Never expose API keys in frontend applications.
+- Rotate keys regularly or immediately if compromised.
+- Monitor logs for abuse.
 
-Scenario: A financial service provider wants to verify the phone number before onboarding a user. {{ className: 'lead' }}
+# Frequently Asked Questions (FAQ) {{className: 'mt-10'}}
+1. **How do I get an API key?** <br />
+API keys can be generated from the SMMS portal. {{className: 'lead'}}
 
-Step 1: Call the verification API with the phone number. {{className: 'lead'}}
+2. **Can I use the same API key across multiple services?** <br />
+Yes, but it’s best practice to use separate keys for production, testing, and environments requiring different access levels. {{className: 'lead'}}
 
-<div>
-<CodeGroup>
+3. **What phone number format should I use in requests?** <br />
+You should use the MSISDN format based on the E.164 standard (without the + symbol) for all phone numbers in your API requests. {{className: 'lead'}}
 
-```json {{ language: 'js' }}
-GET /api/v1/numbers/+2348001234567/verify
-```
-</CodeGroup>
-</div>
+4. **What does 'Null/Normal' mean in the verification response?** <br />
+Null/Normal indicates that the phone number does not fall under any defined status—such as churned, swapped, or blacklisted. It may also mean that the number has not yet been registered or updated in the SMMS database. {{className: 'lead'}}
 
-Step 2: If status is 'Reassigned' or 'Inactive', halt onboarding process to prevent fraud. {{ className: 'lead' }}
+5. **How frequently is the data updated?** <br />
+As frequently as possible. {{className: 'lead'}}
 
-Step 3: If status is 'Active', proceed with onboarding. {{ className: 'lead' }}
+6. **What happens if I try to update a number I'm not authorized to manage?** <br />
+If you attempt to update the status of a phone number that you are not authorized to manage, the system will reject the request and return an authorization error. Only registered telecom operators can update numbers within their allocated ranges. Unauthorized access attempts are logged and monitored for security and compliance purposes. {{className: 'lead'}}
 
-## Versioning and Support
+7. **Is batch verification supported?** <br />
+Yes, batch verification is supported via the Bulk Verification endpoint. Organizations can submit multiple phone numbers in a single request. While the API will acknowledge receipt of the request, the verification results for each number will be sent asynchronously to the webhook provided by the requesting organization. {{className: 'lead'}}
 
-- API Version: v1.0 
-- For support contact: api-support@smms.ng
+8. **What should I do when I hit the rate limit?** <br />
+If you hit the rate limit (429 error), wait before retrying. {{className: 'lead'}}
 
+9. **What if I send an invalid status in an update request?** <br />
+If your update request contains an invalid or missing status value, the system will reject the request and return a 400 Bad Request error. The response will include a clear message indicating the issue. {{className: 'lead'}}
 
-{/* <Guides />
-
-<Resources /> */}
+10. **Is there a sandbox for testing?** <br />
+Yes, SMMS provides a sandbox environment for testing integrations before going live. The sandbox allows you to simulate requests (e.g., verification and status updates) without affecting production data. You’ll receive mock responses that help validate your implementation. {{className: 'lead'}}
+To request access to the sandbox, please contact the SMMS onboarding or support team. {{className:'lead'}}
