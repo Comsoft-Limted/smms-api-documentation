@@ -42,29 +42,3 @@ EXPOSE 3000
 ENV PORT 3000
 CMD ["node", "server.js"]
 
-# Production image, copy all the files and run next
-FROM node:18-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry.
-# ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# You only need to copy next.config.js if you are NOT using the standalone output
-COPY --from=builder /app/next.config.js ./
-# COPY --from=builder /app/public ./public
-# COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-# COPY --from=builder /app/package.json ./package.json
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-# Make sure your start script in package.json listens on 0.0.0.0
-# For example: "start": "next start -p $PORT" or "next start -H 0.0.0.0 -p $PORT"
-CMD ["npm", "start"]
