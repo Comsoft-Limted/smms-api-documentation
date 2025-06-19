@@ -3,51 +3,68 @@ import { Resources } from '@/components/Resources'
 import { HeroPattern } from '@/components/HeroPattern'
 
 export const metadata = {
-  title: 'SMMS API Documentation',
+  title: 'TIRMP API Documentation',
   description:
-    'Learn everything there is to know about the SMMS API and integrate SMMS into your product.',
+    'Learn everything there is to know about the TIRMP API and integrate TIRMP into your product.',
 }
 
 <HeroPattern />
 
-# Prerequisite
-Before integrating with the SMMS API, ensure the following requirements are in place: {{ className: 'lead' }}
+# Prerequisite {{ className: 'text-4xl'}}
+Before integrating with the TIRMP API, ensure the following requirements are in place: {{ className: 'lead' }}
 
-## Onboarding and Registeration {{ className: 'mt-0'}}
-- Your organization must be registered and approved by the SMMS system administrator.
+### Onboarding and Registeration {{ className: 'mt-0'}}
+- Your organization must be registered and approved by the TIRMP system administrator.
 - API access credentials (API key) will be issued upon successful onboarding.
 
-## API Key Generation {{ className: 'mt-0'}}
+### API Key Generation {{ className: 'mt-0'}}
 
-- An administrator from your organization must log into the SMMS portal to generate an API key.
+- An administrator from your organization must log into the TIRMP portal to generate an API key.
 - Keep this key secure; it will be used in the Authorization header for every API request.
 
-## Webhook Setup (for Bulk Verification) {{ className: 'mt-0'}}
+### Webhook Setup (for Bulk Verification) {{ className: 'mt-0'}}
 
-- If you intend to use the bulk verification endpoint, set up a secure and accessible webhook URL to receive asynchronous results. The webhook can be configured via the SMMS platform.
+- If you intend to use the bulk verification endpoint, set up a secure and accessible webhook URL to receive asynchronous results. The webhook can be configured via the TIRMP platform.
 
-## MSISDN Format Compliance {{ className: 'mt-0'}}
+### MSISDN Format Compliance {{ className: 'mt-0'}}
 
 - All phone numbers must be submitted in the 11-digit MSISDN format (e.g., 08012345678), based on the E.164 standard without the '+' symbol.
 
-## Network and Security Readiness {{ className: 'mt-0'}}
+### Network and Security Readiness {{ className: 'mt-0'}}
 
-- Ensure outbound HTTPS traffic is allowed from your system to the SMMS API endpoints.
+- Ensure outbound HTTPS traffic is allowed from your system to the TIRMP API endpoints.
 - Use secure HTTPS (TLS) communication at all times.
 
-## Development Environment Access {{ className: 'mt-0'}}
+### Development Environment Access {{ className: 'mt-0'}}
 
-- For testing, request access to the SMMS sandbox environment to simulate API requests and verify your integration.
+- For testing, request access to the TIRMP sandbox environment to simulate API requests and verify your integration.
 
-## Development Team Familiarity {{ className: 'mt-0'}}
+### Development Team Familiarity {{ className: 'mt-0'}}
 
 - Your developers should be familiar with RESTful API principles, JSON payload structures, and handling common HTTP status codes.
 
 
 
-# Introduction {{ className: 'mt-20'}}
+# Introduction {{ className: 'mt-20 text-4xl'}}
 
-The Safeguarding Mobile Money Services (SMMS) API enables centralized verification and status updates of mobile phone numbers. This documentation covers the two available endpoints: Phone Number Status Verification and Phone Number Status Update. It includes authentication guidance, response schemas, error handling, and best practices. {{ className: 'lead' }}
+The Telecomm Identity Risk Management Portal (TIRMP) API provides a centralized and secure interface for verifying and updating the status of mobile phone numbers across participating platforms. It is designed to support fraud prevention, regulatory compliance, and customer data integrity for stakeholders in the mobile and digital financial ecosystem. {{ className: 'lead' }}
+
+The TIRMP API serves two main categories of users: {{className:'lead'}}
+
+**Telecom Operators:** 
+These entities are authorized to update the status of phone numbers in the TIRMP database—such as marking numbers as churned, swapped, blacklisted, or valid (null/normal). This ensures accurate, real-time information is available to downstream service providers. {{className: 'lead'}}
+
+**Service Providers (e.g., fintechs, banks, insurance companies):** 
+These users can verify the status of phone numbers to ensure they are safe and currently owned by the intended user. This is especially critical during onboarding, authentication, or other sensitive customer interactions. {{className: 'lead'}}
+
+Access to endpoints is strictly controlled: {{className: 'lead'}}
+
+Status update endpoints are exclusive to authorized telecom operators. {{className: 'lead'}}
+
+Verification endpoints are available to all registered and approved service providers. {{className: 'lead'}}
+
+This documentation outlines all available API endpoints and includes comprehensive guidance on authentication, response structures, error handling, and implementation best practices to ensure seamless integration and data consistency. {{className: 'lead'}}
+
 
 <div className="not-prose mt-6 mb-16 flex gap-3">
   <Button href="/quickstart" arrow="right">
@@ -58,7 +75,7 @@ The Safeguarding Mobile Money Services (SMMS) API enables centralized verificati
   </Button>
 </div>
 
-# Authentication
+# Authentication {{ className: ' text-4xl' }}
 
 All API calls require API Key-based authentication. The API key must be included in the Authorization header for every request. 
 Admins can generate API keys for their accounts directly from the platform. {{ className: 'lead' }}
@@ -75,7 +92,7 @@ Admins can generate API keys for their accounts directly from the platform. {{ c
 
 Tokens are provided to each registered entity during onboarding by the system administrator. {{ className: 'lead' }}
 
-# Glossary {{className: 'mb-5 mt-14'}}
+# Glossary {{className: 'mb-5 mt-14 text-4xl'}}
 
 - **MSISDN:** Mobile Subscriber Integrated Services Digital Network Number (11 digits)
 - **API Key:** Security passed in headers for authorization 
@@ -86,49 +103,51 @@ Tokens are provided to each registered entity during onboarding by the system ad
 - **Null/Normal:** Number not in any of the above states
 
 
-{/* ## Request/Response Schema Definitions
+# API endpoints {{ className: 'mb-5 mt-10 text-4xl'}}
 
-Phone Number Status Update Request Schema: {{ className: 'lead' }}
-<CodeGroup>
-
-```json {{ language: 'js' }}
-{ 
-  "status": { 
-      "type": "string", 
-      "enum": ["Active", "Inactive", "Reassigned"], 
-      "required": true 
-  }
-} 
-```
-</CodeGroup>
-
-## Phone Number Verification Response Schema:
-
-<div className="mb-20">
-<CodeGroup>
-
-```json {{ language: 'js' }}
-{ 
-    "msisdn": "string", 
-    "current_status": "string", 
-    "last_updated": "ISO date format (YYYY-MM-DD)" 
-}
-```
-</CodeGroup>
-</div> */}
-
-# API endpoints {{ className: 'mb-5 mt-10'}}
+## Telecom Operator Endpoints {{className: 'lead'}}
+Purpose: There are two endpoints available for updating phone number statuses in the TIRMP database—one for single updates and one for bulk updates. These endpoints enable telecom operators to modify the status of mobile numbers, ensuring that service providers across platforms have access to the most current information. Statuses may include blacklisted, churned, swapped, or valid (Null/Normal). This real-time synchronization supports effective risk mitigation and fraud prevention. {{ className: 'lead'}}
 
 ## Phone Number Status Update Endpoint.
+Method:  PUT <br/>
+URL:  https://smms.cabsolonline.com/v1/phone/api/phone-numbers/status
 
-Purpose: This endpoint allows telecom operators to update the status of a mobile phone number in the SMMS database. It ensures that service providers across platforms have access to the most current status—such as whether a number has been blacklisted, churned, swapped, or is valid (Null/Normal)—for risk mitigation and fraud prevention. {{ className: 'lead' }}
+
+{/* Purpose: This endpoint allows telecom operators to update the status of a mobile phone number in the TIRMP database. It ensures that service providers across platforms have access to the most current status—such as whether a number has been blacklisted, churned, swapped, or is valid (Null/Normal)—for risk mitigation and fraud prevention. {{ className: 'lead' }} */}
 
 <hr className='py-0'/>
 
 **When to Use:** {{className:'lead'}}
-- After phone number is   
-- Before initiating sensitive transactions.
-- Periodic checks to ensure ongoing validity of stored numbers.
+- After phone number is **churned**
+- When a number is **blacklisted** due to fraudulent activity or regulatory actions.
+- When a number is **swapped**
+
+
+<div>
+  <table class="w-full border-collapse shadow-sm">
+    <thead>
+      <tr>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Parameter</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Type</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Required</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-3 text-left font-semibold">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">uid</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">UUID</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">Yes</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          Unique identifier of the mobile number record
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+uid is a required path variable and must be included directly in the endpoint URL, e.g., `/phone-status/{uid}`. {{className: 'lead'}}
+
 
 **Phone Number Status Update Request Schema:**
 <div className="mb-10">
@@ -136,9 +155,10 @@ Purpose: This endpoint allows telecom operators to update the status of a mobile
 
 ```json {{ language: 'js' }}
 { 
-    "phoneNumber": "+2348001234567", 
-    "status": "Blacklisted, Churned, Null/Normal, Swapped", 
-    "remarks": "string" 
+    "reason": "culpa quis dolor", 
+    "status": "nulla", 
+    "reassignmentDate": "0006-09-15",
+    "occurrenceOfStatusDate": "0006-09-15"
 }
 ```
 </CodeGroup>
@@ -150,22 +170,22 @@ Purpose: This endpoint allows telecom operators to update the status of a mobile
 
 ```json {{ language: 'js' }}
 { 
-    "status": "string",
-    "data": {
-      "phoneNumber": "string",
-      "status": "string",
-      "updateTimestamp": "2025-04-25T11:05:52.250Z",
-      "remarks": "string"
-    }
+    "oldStatus": "dolor la",
+    "newStatus": "dolor mollit nisi amet",
+    "changeReason": "ullamco quis",
+    "phoneNumber": "et nulla ullamco",
+    "changedByName": "aliquip ex",
+    "createdAt": "1987-10-29T13:54:23.021Z"
 }
 ```
 </CodeGroup>
 </div>
 
 ## Phone Number Status Update (bulk) Endpoint.
-Allows authorized users to update the status of multiple phone numbers. {{className: 'lead'}}
+Purpose: This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the TIMRP system. For example, suppose several numbers become churned, swapped, or blacklisted. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers. {{className: 'lead'}}
 
-**Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the SMMS system. For example, suppose several numbers become churned, swapped, or blacklisted.. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers. {{className:'lead'}}
+Method: PUT <br/>
+URL :  https://smms.cabsolonline.com/v1/phone/api/phone-numbers/status/bulk
 
 **Sample Request Payload**
 <div className="mb-10">
@@ -173,13 +193,10 @@ Allows authorized users to update the status of multiple phone numbers. {{classN
 
 ```json {{ language: 'js' }}
 { 
-   "updates": [
-    {
-      "phoneNumber": "string",
-      "status": "string",
-      "remarks": "string"
-    }
-  ]
+    "status": "CHURNED,SWAPPED,BLACKLISTED,NORMAL,NULL",
+    "uid": "sunt proident",
+    "reassignmentDate": "0006-09-15",
+    "occurrenceOfStatusDate": "0006-09-15"
 }
 ```
 </CodeGroup>
@@ -201,18 +218,74 @@ Allows authorized users to update the status of multiple phone numbers. {{classN
 </CodeGroup>
 </div>
 
+**status:** "" — Represents the overall outcome of the request. It typically returns values like "success" or "error" to indicate whether the operation completed successfully or failed. {{className: 'lead'}}
+**data:** "" — Contains the actual result or payload of the response, such as a list of the updated phone number records or related output.
+**statusCode:** "" — Represents the HTTP status code associated with the response, such as 200 for success or 400 for a bad request. It helps clients interpret the result programmatically.
 
-## Phone Number Status Verification Endpoint
+## Phone Number Upload (Bulk) Endpoint
+Purpose: This endpoint allows telecom operators to seamlessly upload multiple phone numbers via API integration, enabling smooth interoperability with their legacy systems. {{className:'lead'}}
 
-**Purpose:** Before a service provider onboards a user or allows them to perform sensitive operations (like opening an account, initiating transactions, or resetting passwords), they should confirm that the phone number is safe to use. {{ className: 'lead' }}
+Method: POST <br/>
+URL: https://smms.cabsolonline.com/v1/phone/api/phone-numbers/upload/bulk
 
-This endpoint checks the current status of the phone number in the SMMS database. {{className:'lead'}}
+**Sample Request**
+<div className="mb-10">
+<CodeGroup>
 
-When to Use: {{className:'lead'}} 
+```json {{ language: 'js' }}
+{ 
+  "phoneNumbers": [
+    {
+      "phoneNumber": "08012345678",
+      "reassignmentDate": "2023-06-15",
+      "occurrenceOfStatusDate": "2023-06-01",
+      "status": "REASSIGNED",
+      "mobileNetwork": "MTN"
+    },
+    {
+      "phoneNumber": "08123456789",
+      "reassignmentDate": "2023-07-10",
+      "occurrenceOfStatusDate": "2023-07-01",
+      "status": "SWAPPED",
+      "mobileNetwork": "Airtel"
+    },
+    {
+      "phoneNumber": "09098765432",
+      "reassignmentDate": "2023-08-20",
+      "occurrenceOfStatusDate": "2023-08-10",
+      "status": "CHURNED",
+      "mobileNetwork": "Glo"
+    }
+  ]
+}
 
-- During user onboarding
+```
+</CodeGroup>
+</div>
+
+**Sample Response**
+<div className="mb-10">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  "status": "string",
+  "data": "string",
+  "statusCode": "string"
+}
+```
+</CodeGroup>
+</div>
+
+## Service Provider Endpoints (Fintechs, Banks, etc.)
+
+Purpose: These endpoints are accessible to registered organizations to verify the current status of phone numbers. Before a service provider onboards a user or allows them to perform sensitive operations—such as opening an account, initiating transactions, or resetting passwords—they should confirm that the phone number is both safe and currently owned by the user. This verification step helps detect cases where a number may have been recently churned, blacklisted, or swapped, thereby reducing the risk of fraud or unauthorized access. {{className:'lead'}}
+This endpoint checks the current status of the phone number in the TIRMP database. {{className: 'lead'}}
+
+When to Use:
+- During user onboarding.
 - Before initiating sensitive transactions.
--  Periodic checks to ensure ongoing validity of stored numbers.
+- Periodic checks to ensure the ongoing validity of stored numbers.
 
 ## Process flow:
 
@@ -223,6 +296,24 @@ When to Use: {{className:'lead'}}
     - **Swapped** → Indicates that the SIM card associated with the phone number has been replaced—typically due to loss, theft, or damage. While the number may still belong to the same user, this status may warrant additional verification to ensure the user's identity and prevent potential misuse.  
     - **Null/Normal** → Number either not found or does not exist i any of the states listed above.
 
+## Phone Number Status Verification Endpoint
+
+Purpose: Enables organizations—such as banks, fintechs, and digital service providers—to verify the status of an individual mobile number in the TIRMP database. The status may include blacklisted, churned, swapped, or valid (null/normal). This helps ensure real-time access to accurate number status for fraud prevention and risk mitigation across platforms. {{className: 'lead'}}
+
+METHOD: POST <br/>
+URL:  'https://smms.cabsolonline.com/v1/phone/api/phone-numbers/verify
+
+**Sample Request**
+<div className="mb-10">
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{ 
+  "phoneNumber": "07444009986",
+}
+```
+</CodeGroup>
+</div>
 
 ## Sample Request
 <div className="mb-5">
@@ -243,23 +334,29 @@ When to Use: {{className:'lead'}}
 
 ```json {{ language: 'js' }}
 { 
-  "status": "string",
-  "data": {
-    "status": "BLACKLISTED, CHURNED, REASSIGNED, SWAPPED, NORMAL, NULL",
-    "requestId": "string",
-    "reassignmentDate": "2025-04-30",
-    "verificationTimestamp": "2025-04-30T08:24:26.208Z",
-    "occurrenceOfStatusDate": "2025-04-30",
-    "mobileNetwork": "string",
-    "msisdn": "string"
-  },
+  "status": "Success",
+    "data": {
+      "phoneNumber": "081818#5039",
+      "status": "SWAPPED",
+      "phoneStatus": null,
+      "requestId": "3ddde7f7-e979-4ed6-9e1a-5c947133c887",
+      "remarks": null,
+      "mobileNetwork": "Etisalat",
+      "reassignmentDate": "2022-06-02",
+      "verificationTimestamp": "2025-06-11T13:40:42.524013603",
+      "occurrenceOfStatusDate": null,
+      "errorMessage": null,
+      "user": null
+    },
+  "statusCode":
 }
 ```
 </CodeGroup>
 </div>
 
-## Phone Number Status Verification (Bulk)
-**Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the SMMS system. For example, suppose several numbers become churned, swapped, blacklisted, or reassigned. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers. {{className: 'lead'}}
+## Phone Number Status Verification (Bulk) Endpoint
+**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMP system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. {{className: 'lead'}}
+To use this endpoint for bulk verification, organizations must first set up a webhook through their account on the platform. This webhook will serve as the destination for receiving the verification results. If the operation is successful, a structured JSON response with the verification status of each phone number will be automatically sent to the registered webhook, enabling efficient and automated processing. {{className: 'lead'}}
 
 **Sample Request Payload**
 <div className="mb-10">
@@ -267,12 +364,12 @@ When to Use: {{className:'lead'}}
 
 ```json {{ language: 'js' }}
 { 
- "updates": [
-    {
-      "phoneNumber": "string",
-      "status": "string",
-      "remarks": "string"
-    }
+ "phoneNumbers": [
+    "0801234578",
+    "28123456789",
+    "09087654321",
+    "07011223344",
+    "0912345670"
   ]
 }
 ```
@@ -287,9 +384,9 @@ When to Use: {{className:'lead'}}
 { 
  "updates": [
     {
-      "phoneNumber": "string",
       "status": "string",
-      "remarks": "string"
+      "data": "string",
+      "statusCode": "string"
     }
   ]
 }
@@ -319,6 +416,7 @@ When to Use: {{className:'lead'}}
 ```
 </CodeGroup>
 </div>
+
 <div className="mb-10">
 <CodeGroup>
 
@@ -344,7 +442,7 @@ Only authorized entities can update statuses. Attempts by unauthorized users wil
 
 # Error handling
 
-SMMS uses standard HTTP status codes. Below are common responses. {{ className: 'lead' }}
+TIRMP uses standard HTTP status codes. Below are common responses. {{ className: 'lead' }}
 
 - 400 Bad Request: Missing or invalid parameter 
 - 401 Unauthorized: Missing or invalid API token 
@@ -353,9 +451,9 @@ SMMS uses standard HTTP status codes. Below are common responses. {{ className: 
 - 429 Too Many Requests: Rate limit exceeded 
 - 500 Internal Server Error: Unexpected error 
 
+**Sample Error Response**
 <div className="mb-10">
 <CodeGroup>
-
 ```json {{ language: 'js' }}
 { 
   "error": { 
@@ -408,15 +506,15 @@ SMMS uses standard HTTP status codes. Below are common responses. {{ className: 
   </table>
 </div>
 
-# Security Considerations
+# Security Considerations {{className: 'text-4xl'}}
 - All API calls must be over HTTPS.
 - Never expose API keys in frontend applications.
 - Rotate keys regularly or immediately if compromised.
 - Monitor logs for abuse.
 
-# Frequently Asked Questions (FAQ) {{className: 'mt-10'}}
+# Frequently Asked Questions (FAQ) {{className: 'mt-10 text-4xl'}}
 1. **How do I get an API key?** <br />
-API keys can be generated from the SMMS portal. {{className: 'lead'}}
+API keys can be generated from the TIRMP portal. {{className: 'lead'}}
 
 2. **Can I use the same API key across multiple services?** <br />
 Yes, but it’s best practice to use separate keys for production, testing, and environments requiring different access levels. {{className: 'lead'}}
@@ -425,7 +523,7 @@ Yes, but it’s best practice to use separate keys for production, testing, and 
 You should use the MSISDN format based on the E.164 standard (without the + symbol) for all phone numbers in your API requests. {{className: 'lead'}}
 
 4. **What does 'Null/Normal' mean in the verification response?** <br />
-Null/Normal indicates that the phone number does not fall under any defined status—such as churned, swapped, or blacklisted. It may also mean that the number has not yet been registered or updated in the SMMS database. {{className: 'lead'}}
+Null/Normal indicates that the phone number does not fall under any defined status—such as churned, swapped, or blacklisted. It may also mean that the number has not yet been registered or updated in the TIRMP database. {{className: 'lead'}}
 
 5. **How frequently is the data updated?** <br />
 As frequently as possible. {{className: 'lead'}}
@@ -443,5 +541,5 @@ If you hit the rate limit (429 error), wait before retrying. {{className: 'lead'
 If your update request contains an invalid or missing status value, the system will reject the request and return a 400 Bad Request error. The response will include a clear message indicating the issue. {{className: 'lead'}}
 
 10. **Is there a sandbox for testing?** <br />
-Yes, SMMS provides a sandbox environment for testing integrations before going live. The sandbox allows you to simulate requests (e.g., verification and status updates) without affecting production data. You’ll receive mock responses that help validate your implementation. {{className: 'lead'}}
-To request access to the sandbox, please contact the SMMS onboarding or support team. {{className:'lead'}}
+Yes, TIRMP provides a **sandbox environment** for testing integrations before going live. The sandbox allows you to simulate requests (e.g., verification and status updates) without affecting production data. You’ll receive mock responses that help validate your implementation. {{className: 'lead'}}
+To request access to the sandbox, please contact the TIRMP onboarding or support team. {{className:'lead'}}
