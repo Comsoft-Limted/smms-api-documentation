@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 
-import { Footer } from '@/components/Footer'
+// import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
-import { Logo } from '@/components/Logo'
+// import { Logo } from '@/components/Logo'
 import { Navigation } from '@/components/Navigation'
 import { type Section, SectionProvider } from '@/components/SectionProvider'
+// import logo from "@/images/logos/app-logo.svg"
 
 export function Layout({
   children,
@@ -29,7 +30,14 @@ export function Layout({
           <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:px-6 lg:pt-4 lg:pb-8 xl:w-80 lg:dark:border-white/10">
             <div className="hidden lg:flex">
               <Link href="/" aria-label="Home">
-                <Logo className="h-6" />
+                {/* <img src={logo} /> */}
+                
+                <div className='leading-3 mt-2'>
+                  <div className='font-bold text-2xl'>TIRMP</div>
+                  <small className='text-[10px]'>
+                    Telecom Identity Risk Management Portal
+                  </small>
+                </div>
               </Link>
             </div>
             <Header />

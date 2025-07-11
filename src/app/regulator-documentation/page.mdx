@@ -4,17 +4,270 @@ export const metadata = {
     'On this page, we’ll dive into the different contact endpoints you can use to manage contacts programmatically.',
 }
 
-# Contacts
+# Prerequisite {{ className: 'text-4xl'}}
+This API provides external access to the NCC Regulator, allowing telcos that are already pre-approved to bypass the standard onboarding workflow.
 
-As the name suggests, contacts are a core part of Protocol — the very reason Protocol exists is so you can have secure conversations with your contacts. On this page, we'll dive into the different contact endpoints you can use to manage contacts programmatically. We'll look at how to query, create, update, and delete contacts. {{ className: 'lead' }}
+## Authentication
+Clients must include a valid **Bearer Token** in the `Authorization` header of each request.
 
-## The contact model
+## Properties
+- **Auth Type:** Bearer Token
+- **Token Endpoint:** `POST /api/auth/token`
 
-The contact model contains all the information about your contacts, such as their username, avatar, and phone number. It also contains a reference to the conversation between you and the contact and information about when they were last active on Protocol.
+## API Endpoints Overview
+<div>
+  <table class="w-full border-collapse shadow-sm">
+    <thead>
+      <tr>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Method</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Endpoint</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">POST</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">/api/ncc/v1/onboard-entity</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          Onboard telco entity and admin via NCC bypass
+        </td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">POST</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">/api/ncc/v1/upload-document</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          Upload required entity documents
+        </td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">POST</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">/api/ncc/v1/login</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          Log in as the onboarded entity admin
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-### Properties
+## 1. Onboard Entity
 
-<Properties>
+**Endpoint:** `POST /api/ncc/v1/onboard-entity`  
+**Description:** Registers a new telco entity along with its admin by bypassing the standard onboarding flow. Intended for entities pre-approved by NCC.
+
+### Request
+
+- **Content-Type:** `application/json`
+
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{
+  "cac": "string",
+  "name": "string",
+  "isDocumentRequired": true,
+  "adminName": "string",
+  "adminPhone": "string",
+  "adminEmail": "string",
+  "adminPassword": "string"
+}
+```
+</CodeGroup>
+
+### Response
+
+- **Status Code:** `200 OK`
+
+<CodeGroup>
+
+```json {{ language: 'js' }}
+{
+  "status": "string",
+  "data": {
+    "entityUid": "uuid",
+    "entityName": "string",
+    "cacNo": "string",
+    "entityType": "NCC",
+    "entityStatus": "Approved",
+    "isDocumentRequired": true,
+    "adminUid": "uuid",
+    "adminName": "string",
+    "adminEmail": "string",
+    "adminPhone": "string",
+    "isAdminVerified": true,
+    "message": "string"
+  },
+  "statusCode": "string"
+}
+```
+</CodeGroup>
+
+## 2. Upload documents
+
+**Endpoint:** `POST /api/ncc/v1/upload-document`  
+**Description:** Uploads required documents for an onboarded entity. This is only necessary if `isDocumentRequired = true`.
+
+###  Request
+
+- **Content-Type:** `multipart/form-data`
+
+<div>
+  <table class="w-full border-collapse shadow-sm">
+    <thead>
+      <tr>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Field</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Type</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Required</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">type</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">string</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">✅</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          Type of document being uploaded
+        </td>
+      </tr>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">file</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">binary</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">✅</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          Document file (PDF, image, etc.)
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+
+###  Response
+
+- **Status Code:** `200 OK`
+
+<CodeGroup>
+```json
+{
+  "status": "string",
+  "data": "string",
+  "statusCode": "string"
+}
+```
+</CodeGroup>
+
+##  3. Admin Login
+
+**Endpoint:** `POST /api/ncc/v1/login`  
+**Description:** Authenticates the admin user created through the NCC regulator bypass. On success, returns a session token and basic user details.
+
+###  Request
+
+- **Content-Type:** `application/json`
+
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+###  Response
+
+- **Status Code:** `200 OK`
+
+```json
+{
+  "status": "string",
+  "data": {
+    "fullName": "string",
+    "userType": "REGULATOR",
+    "tokenMeta": {
+      "token": "string",
+      "expiration": "2025-07-10T11:35:01.342Z"
+    },
+    "isVerified": true
+  },
+  "statusCode": "string"
+}
+```
+
+---
+
+##  Notes & Guidelines
+
+- Entities onboarded through this API are **automatically approved**.
+- The `isDocumentRequired` flag determines whether the document upload step is mandatory.
+- Ensure that both `adminEmail` and `adminPhone` are **unique** in the system to avoid conflicts.
+
+##  Glossary
+<div>
+  <table class="w-full border-collapse shadow-sm">
+    <thead>
+      <tr>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Term</th>
+        <th class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4 py-1 text-left font-semibold">Definition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          **Bearer Token** 
+        </td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          A token included in the **Authorization** header for secure API access. 
+        </td>
+      </tr>
+
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">**CAC**</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+          A token included in the **Authorization** header for secure API access.  
+        </td>
+      </tr>
+
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">**Entity**</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+           A telco or service provider being onboarded into the system. 
+        </td>
+      </tr>
+
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">**Admin**</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+           The main administrative user associated with a telco entity. 
+        </td>
+      </tr>
+
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">**UUID**</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+           Universally Unique Identifier used to identify records like entities and users. 
+        </td>
+      </tr>
+
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">**Multipart/Form-Data**</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+           A content type used for submitting files and form data in the same request. 
+        </td>
+      </tr>
+
+      <tr>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">**Verified Admin**</td>
+        <td class="border-[0.5px] border-[#2D2D2F] bg-[#1D1D20] px-4">
+            An admin whose phone number/email has passed validation. 
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+{/* <Properties>
   <Property name="id" type="string">
     Unique identifier for the contact.
   </Property>
@@ -391,4 +644,4 @@ The contact model contains all the information about your contacts, such as thei
     </CodeGroup>
 
   </Col>
-</Row>
+</Row> */}
