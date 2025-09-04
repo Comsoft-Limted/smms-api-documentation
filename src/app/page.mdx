@@ -167,15 +167,17 @@ The request body must be an array of objects, each representing a phone number u
 ```json
 {
   "status": "CHURNED,SWAPPED,BLACKLISTED,NORMAL,NULL",
-  "uid": "sunt proident",
+  "phoneNumber": "090XXXXXXXX",
   "reassignmentDate": "0006-09-15",
-  "occurrenceOfStatusDate": "0006-09-15"
+  "occurrenceOfStatusDate": "0006-09-15",
+  "remarks":""
 },
 {
   "status": "CHURNED,SWAPPED,BLACKLISTED,NORMAL,NULL",
-  "uid": "quis labore",
+  "phoneNumber": "090XXXXXXXX",
   "reassignmentDate": "02-09-2013",
-  "occurrenceOfStatusDate": "06-09-2014"
+  "occurrenceOfStatusDate": "06-09-2014",
+  "remarks":""
 }
 ```
 
@@ -184,7 +186,10 @@ The request body must be an array of objects, each representing a phone number u
 ```json
 {
   "status": "string",
-  "data": "string",
+  "data": {
+    "message":"string",
+    "link":"string"
+  },
   "statusCode": "string"
 }
 ```
@@ -212,22 +217,19 @@ The request body must be an array of objects, each representing a phone number u
       "phoneNumber": "08012345678",
       "reassignmentDate": "2023-06-15",
       "occurrenceOfStatusDate": "2023-06-01",
-      "status": "REASSIGNED",
-      "mobileNetwork": "MTN"
+      "status": "REASSIGNED"
     },
     {
       "phoneNumber": "08123456789",
       "reassignmentDate": "2023-07-10",
       "occurrenceOfStatusDate": "2023-07-01",
-      "status": "SWAPPED",
-      "mobileNetwork": "Airtel"
+      "status": "SWAPPED"
     },
     {
       "phoneNumber": "09098765432",
       "reassignmentDate": "2023-08-20",
       "occurrenceOfStatusDate": "2023-08-10",
-      "status": "CHURNED",
-      "mobileNetwork": "Glo"
+      "status": "CHURNED"
     }
   ]
 }
