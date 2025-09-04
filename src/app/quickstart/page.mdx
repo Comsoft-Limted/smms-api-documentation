@@ -1,98 +1,71 @@
 export const metadata = {
   title: 'Quickstart',
   description:
-    'This guide will get you all set up and ready to use the Protocol API. We’ll cover how to get started an API client and how to make your first API request.',
+    'Get started with the TIRMP API quickly. Learn how to authenticate and make your first API request.',
 }
 
 # Quickstart
 
-This guide will get you all set up and ready to use the Protocol API. We'll cover how to get started using one of our API clients and how to make your first API request. We'll also look at where to go next to find all the information you need to take full advantage of our powerful REST API. {{ className: 'lead' }}
+This guide will get you set up and ready to use the TIRMP API. We'll cover how to authenticate your requests and make your first API call. {{ className: 'lead' }}
 
 <Note>
-  Before you can make requests to the Protocol API, you will need to grab your
-  API key from your dashboard. You find it under [Settings &raquo; API](#).
+  Before you can make requests to the TIRMP API, you will need to get your
+  API key from the TIRMP portal. Contact your system administrator to obtain access.
 </Note>
 
-## Choose your client
+## Authentication Setup
 
-Before making your first API request, you need to pick which API client you will use. In addition to good ol' cURL HTTP requests, Protocol offers clients for JavaScript, Python, and PHP. In the following example, you can see how to install each client.
+Before making your first API request, you need to set up authentication. The TIRMP API uses API key-based authentication.
 
-<CodeGroup>
+### Get Your API Key
+
+1. Contact your system administrator to obtain access to the TIRMP portal
+2. Log into the TIRMP portal with your credentials
+3. Navigate to the API settings section
+4. Generate a new API key for your application
+
+### Set Up Your Environment
+
+Store your API key securely in your environment variables:
+
+```bash
+export TIRMP_API_KEY="your_api_key_here"
+```
+
+## Making Your First API Request
+
+Now you're ready to make your first call to the TIRMP API. Below, you can see how to send a POST request to verify a phone number status.
+
+### Phone Number Verification Example
 
 ```bash {{ title: 'cURL' }}
-# cURL is most likely already installed on your machine
-curl --version
+curl -X POST https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/verify \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"phoneNumber": "08012345678"}'
 ```
 
-```bash {{ language: 'js' }}
-# Install the Protocol JavaScript SDK
-npm install @example/protocol-api --save
+### Response Example
+
+```json
+{
+  "status": "Success",
+  "data": {
+    "phoneNumber": "08012345678",
+    "status": "NORMAL",
+    "requestId": "3ddde7f7-e979-4ed6-9e1a-5c947133c887",
+    "mobileNetwork": "MTN",
+    "verificationTimestamp": "2025-01-15T10:30:00.000Z"
+  },
+  "statusCode": "200"
+}
 ```
 
-```bash {{ language: 'python' }}
-# Install the Protocol Python SDK
-pip install protocol_api
-```
+## What's Next?
 
-```bash {{ language: 'php' }}
-# Install the Protocol PHP SDK
-composer require protocol/sdk
-```
+Great! You've successfully made your first API request. Here are some next steps:
 
-</CodeGroup>
-
-<div className="not-prose">
-  <Button href="/sdks" variant="text" arrow="right">
-    <>Check out our list of first-party SDKs</>
-  </Button>
-</div>
-
-## Making your first API request
-
-After picking your preferred client, you are ready to make your first call to the Protocol API. Below, you can see how to send a GET request to the Conversations endpoint to get a list of all your conversations. In the cURL example, results are limited to ten conversations, the default page length for each client.
-
-<CodeGroup tag="GET" label="/v1/conversations">
-
-```bash {{ title: 'cURL' }}
-curl -G https://api.protocol.chat/v1/conversations \
-  -H "Authorization: Bearer {token}" \
-  -d limit=10
-```
-
-```js
-import ApiClient from '@example/protocol-api'
-
-const client = new ApiClient(token)
-
-await client.conversations.list()
-```
-
-```python
-from protocol_api import ApiClient
-
-client = ApiClient(token)
-
-client.conversations.list()
-```
-
-```php
-$client = new \Protocol\ApiClient($token);
-
-$client->conversations->list();
-```
-
-</CodeGroup>
-
-<div className="not-prose">
-  <Button href="/conversations" variant="text" arrow="right">
-    <>Read the docs for the Conversations endpoint</>
-  </Button>
-</div>
-
-## What's next?
-
-Great, you're now set up with an API client and have made your first request to the API. Here are a few links that might be handy as you venture further into the Protocol API:
-
-- [Grab your API key from the Protocol dashboard](#)
-- [Check out the Conversations endpoint](/conversations)
-- [Learn about the different error messages in Protocol](/errors)
+- [Read the full API documentation](/)
+- [Learn about authentication](/authentication)
+- [Explore telecom operator endpoints](/#telecom-operator-endpoints)
+- [Check out service provider endpoints](/#service-provider-endpoints)

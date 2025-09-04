@@ -231,25 +231,17 @@ function NavigationGroup({
 
 export const navigation: Array<NavGroup> = [
   {
-    title: 'Telco & Organisation',
+    title: 'TIRMP API Documentation',
     links: [
-      { title: 'API Documentation', href: '/' },
-      // { title: 'Quickstart', href: '/quickstart' },
-      // { title: 'SDKs', href: '/sdks' },
-      // { title: 'Authentication', href: '/authentication' },
-      // { title: 'Pagination', href: '/pagination' },
-      // { title: 'Errors', href: '/errors' },
-      // { title: 'Webhooks', href: '/webhooks' },
+      { title: 'Overview', href: '/' },
+      { title: 'Authentication', href: '/authentication' },
+      { title: 'Quickstart', href: '/quickstart' },
     ],
   },
   {
-    title: 'Regulator',
+    title: 'Regulator Documentation',
     links: [
-      { title: 'Regulator API Documentation', href: '/regulator-documentation' },
-      // { title: 'Conversations', href: '/conversations' },
-      // { title: 'Messages', href: '/messages' },
-      // { title: 'Groups', href: '/groups' },
-      // { title: 'Attachments', href: '/attachments' },
+      { title: 'NCC Regulator API', href: '/regulator-documentation' },
     ],
   },
 ]
