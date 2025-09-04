@@ -117,10 +117,10 @@ This endpoint allows authorized users to update the status of a single phone num
 
 ```json
 { 
-  "reason": "culpa quis dolor", 
-  "status": "nulla", 
-  "reassignmentDate": "02-09-2015",
-  "occurrenceOfStatusDate": "02-07-2015"
+  "reason": "Number reassigned to new user", 
+  "status": "CHURNED", 
+  "reassignmentDate": "2025-09-02",
+  "occurrenceOfStatusDate": "2025-07-02"
 }
 ```
 
@@ -128,12 +128,12 @@ This endpoint allows authorized users to update the status of a single phone num
 
 ```json
 {
-  "oldStatus": "dolor la",
-  "newStatus": "dolor mollit nisi amet",
-  "changeReason": "ullamco quis",
-  "phoneNumber": "et nulla ullamco",
-  "changedByName": "aliquip ex",
-  "createdAt": "1987-10-29T13:54:23.021Z"
+  "oldStatus": "NORMAL",
+  "newStatus": "CHURNED",
+  "changeReason": "Number reassigned to new user",
+  "phoneNumber": "08012345678",
+  "changedByName": "John Doe",
+  "createdAt": "2025-01-15T13:54:23.021Z"
 }
 ```
 
@@ -159,25 +159,25 @@ The request body must be an array of objects, each representing a phone number u
   - `SWAPPED`
   - `BLACKLISTED`
   - `NORMAL`
-- `reassignmentDate` *(string, optional)* → Date the number was reassigned, format `DD-MM-YYYY`. Required if `status = SWAPPED OR CHURNED`
-- `occurrenceOfStatusDate` *(string, required)* → Date when the status became effective, format `DD-MM-YYYY`
+- `reassignmentDate` *(string, optional)* → Date the number was reassigned, format `YYYY-MM-DD`. Required if `status = SWAPPED OR CHURNED`
+- `occurrenceOfStatusDate` *(string, required)* → Date when the status became effective, format `YYYY-MM-DD`
 
 **Sample Request Payload:**
 
 ```json
 {
-  "status": "CHURNED,SWAPPED,BLACKLISTED,NORMAL,NULL",
-  "phoneNumber": "090XXXXXXXX",
-  "reassignmentDate": "0006-09-15",
-  "occurrenceOfStatusDate": "0006-09-15",
-  "remarks":""
+  "status": "CHURNED",
+  "phoneNumber": "09012345678",
+  "reassignmentDate": "2025-09-15",
+  "occurrenceOfStatusDate": "2025-09-15",
+  "remarks": "Number reassigned to new user"
 },
 {
-  "status": "CHURNED,SWAPPED,BLACKLISTED,NORMAL,NULL",
-  "phoneNumber": "090XXXXXXXX",
-  "reassignmentDate": "02-09-2013",
-  "occurrenceOfStatusDate": "06-09-2014",
-  "remarks":""
+  "status": "SWAPPED",
+  "phoneNumber": "09098765432",
+  "reassignmentDate": "2025-09-02",
+  "occurrenceOfStatusDate": "2025-09-06",
+  "remarks": "SIM card replaced due to damage"
 }
 ```
 
@@ -215,20 +215,20 @@ The request body must be an array of objects, each representing a phone number u
   "phoneNumbers": [
     {
       "phoneNumber": "08012345678",
-      "reassignmentDate": "2023-06-15",
-      "occurrenceOfStatusDate": "2023-06-01",
+      "reassignmentDate": "2025-06-15",
+      "occurrenceOfStatusDate": "2025-06-01",
       "status": "REASSIGNED"
     },
     {
       "phoneNumber": "08123456789",
-      "reassignmentDate": "2023-07-10",
-      "occurrenceOfStatusDate": "2023-07-01",
+      "reassignmentDate": "2025-07-10",
+      "occurrenceOfStatusDate": "2025-07-01",
       "status": "SWAPPED"
     },
     {
       "phoneNumber": "09098765432",
-      "reassignmentDate": "2023-08-20",
-      "occurrenceOfStatusDate": "2023-08-10",
+      "reassignmentDate": "2025-08-20",
+      "occurrenceOfStatusDate": "2025-08-10",
       "status": "CHURNED"
     }
   ]
@@ -274,15 +274,15 @@ The request body must be an array of objects, each representing a phone number u
 {
   "status": "Success",
   "data": {
-    "phoneNumber": "081818#5039",
+    "phoneNumber": "0818185039",
     "status": "SWAPPED",
     "phoneStatus": null,
     "requestId": "3ddde7f7-e979-4ed6-9e1a-5c947133c887",
     "remarks": null,
     "mobileNetwork": "Etisalat",
-    "reassignmentDate": "2022-06-02",
-    "verificationTimestamp": "2025-06-11T13:40:42.524013603",
-    "occurrenceOfStatusDate": null,
+    "reassignmentDate": "2025-06-02",
+    "verificationTimestamp": "2025-01-15T13:40:42.524Z",
+    "occurrenceOfStatusDate": "2025-06-01",
     "errorMessage": null,
     "user": null
   },
@@ -344,9 +344,9 @@ The request body must be an array of objects, each representing a phone number u
     - `NORMAL` → The number is active and valid
     - `NULL` → No status could be determined
   - **requestId (string)** → Unique identifier for the verification request
-  - **reassignmentDate (string, date)** → Date when the number was reassigned (if applicable). Format: `DD-MM-YYYY`
-  - **verificationTimestamp (string, timestamp)** → Exact date and time the verification was performed. Format: ISO 8601 (`DD-MM-YYYY THH:MM:SS.sssZ`)
-  - **occurrenceOfStatusDate (string, date)** → Date when the status event occurred (e.g., churn date, blacklist date). Format: `DD-MM-YYYY`
+  - **reassignmentDate (string, date)** → Date when the number was reassigned (if applicable). Format: `YYYY-MM-DD`
+  - **verificationTimestamp (string, timestamp)** → Exact date and time the verification was performed. Format: ISO 8601 (`YYYY-MM-DDTHH:MM:SS.sssZ`)
+  - **occurrenceOfStatusDate (string, date)** → Date when the status event occurred (e.g., churn date, blacklist date). Format: `YYYY-MM-DD`
   - **mobileNetwork (string)** → The mobile network operator (e.g., `"MTN"`, `"Airtel"`, `"Glo"`)
   - **msisdn (string)** → The phone number (MSISDN) being verified
 - **statusCode (string/integer)** → HTTP status code returned by the API (`200` for success, `400` for bad request, `404` for not found, etc.)
@@ -362,9 +362,9 @@ The request body must be an array of objects, each representing a phone number u
     "status": "NOT_FOUND",  
     "requestId": "71c0d0b6-ad11-4a12-b86e-7f9db42ee4fc",  
     "reassignmentDate": null,  
-    "verificationTimestamp": "2025-04-29 11:36:15",  
+    "verificationTimestamp": "2025-01-15T11:36:15.000Z",  
     "occurrenceOfStatusDate": null,  
-    "mobileNetwork": "Mobile Network",  
+    "mobileNetwork": "MTN",  
     "msisdn": "08181855634"  
   },  
   "errorMessage": "Phone number record not found"  
@@ -377,10 +377,10 @@ The request body must be an array of objects, each representing a phone number u
   "data": {  
     "status": "CHURNED",  
     "requestId": "388f0644-2dc3-43e4-8064-8162d1092abb",  
-    "reassignmentDate": "2022-06-02",  
-    "verificationTimestamp": "2025-04-30 08:50:00",  
-    "occurrenceOfStatusDate": "2021-05-23",  
-    "mobileNetwork": "Mobile Network",  
+    "reassignmentDate": "2025-06-02",  
+    "verificationTimestamp": "2025-01-15T08:50:00.000Z",  
+    "occurrenceOfStatusDate": "2025-05-23",  
+    "mobileNetwork": "Airtel",  
     "msisdn": "07076295624"  
   }  
 }
