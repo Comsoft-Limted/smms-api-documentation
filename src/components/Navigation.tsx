@@ -231,7 +231,7 @@ function NavigationGroup({
 
 export const navigation: Array<NavGroup> = [
   {
-    title: 'TIRMP API Documentation',
+    title: 'TIRMS API Documentation',
     links: [
       { title: 'Overview', href: '/' },
       { title: 'Authentication', href: '/authentication' },

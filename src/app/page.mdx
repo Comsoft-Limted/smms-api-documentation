@@ -3,28 +3,28 @@ import { Resources } from '@/components/Resources'
 import { HeroPattern } from '@/components/HeroPattern'
 
 export const metadata = {
-  title: 'TIRMP API Documentation',
+  title: 'TIRMS API Documentation',
   description:
-    'Learn everything there is to know about the TIRMP API and integrate TIRMP into your product.',
+    'Learn everything there is to know about the TIRMS API and integrate TIRMS into your product.',
 }
 
 <HeroPattern />
 
 # Prerequisites {{ className: 'text-4xl'}}
-Before integrating with the TIRMP API, ensure the following requirements are in place: {{ className: 'lead' }}
+Before integrating with the TIRMS API, ensure the following requirements are in place: {{ className: 'lead' }}
 
 ## Onboarding and Registration {{ className: 'mt-0'}}
-- Your organization must be registered and approved by the TIRMP system administrator.
+- Your organization must be registered and approved by the TIRMS system administrator.
 - API access credentials (API key) will be issued upon successful onboarding.
 
 ## API Key Generation {{ className: 'mt-0'}}
 
-- An administrator from your organization must log into the TIRMP portal to generate an API key.
+- An administrator from your organization must log into the TIRMS portal to generate an API key.
 - Keep this key secure; it will be used in the Authorization header for every API request.
 
 ## Webhook Setup (for Bulk Verification) {{ className: 'mt-0'}}
 
-- If you intend to use the bulk verification endpoint, set up a secure and accessible webhook URL to receive asynchronous results. The webhook can be configured via the TIRMP platform.
+- If you intend to use the bulk verification endpoint, set up a secure and accessible webhook URL to receive asynchronous results. The webhook can be configured via the TIRMS platform.
 
 ## MSISDN Format Compliance {{ className: 'mt-0'}}
 
@@ -32,7 +32,7 @@ Before integrating with the TIRMP API, ensure the following requirements are in 
 
 ## Network and Security Readiness {{ className: 'mt-0'}}
 
-- Ensure outbound HTTPS traffic is allowed from your system to the TIRMP API endpoints.
+- Ensure outbound HTTPS traffic is allowed from your system to the TIRMS API endpoints.
 - Use secure HTTPS (TLS) communication at all times.
 
 ## Base URL {{ className: 'mt-0'}}
@@ -52,11 +52,11 @@ Before integrating with the TIRMP API, ensure the following requirements are in 
 
 # Introduction {{ className: 'mt-20 text-4xl'}}
 
-The **Telecom Identity Risk Management Portal (TIRMP)** API provides a centralized and secure interface for verifying and updating the status of mobile phone numbers across participating platforms. It supports fraud prevention, regulatory compliance, and the integrity of customer data. {{ className: 'lead' }}
+The **Telecom Identity Risk Management System (TIRMS)** API provides a centralized and secure interface for verifying and updating the status of mobile phone numbers across participating platforms. It supports fraud prevention, regulatory compliance, and the integrity of customer data. {{ className: 'lead' }}
 
 ## User Categories {{className:'lead'}}
 
-**Telecom Operators** – Authorized to update the status of phone numbers in the TIRMP database. {{className: 'lead'}}
+**Telecom Operators** – Authorized to update the status of phone numbers in the TIRMS database. {{className: 'lead'}}
 
 **Service Providers** (fintechs, banks, insurance companies) – Can verify phone number status for safe onboarding, authentication, or transactions. {{className: 'lead'}}
 
@@ -141,7 +141,7 @@ This endpoint allows authorized users to update the status of a single phone num
 
 Allows authorized users to update the status of multiple phone numbers.
 
-**Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the TIRMP system. For example, suppose several numbers become churned, swapped, or blacklisted. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers.
+**Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the TIRMS system. For example, suppose several numbers become churned, swapped, or blacklisted. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers.
 
 **Method:** PUT  
 **URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/status/bulk`  
@@ -292,7 +292,7 @@ The request body must be an array of objects, each representing a phone number u
 
 ### Phone Number Status Verification (Bulk)
 
-**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMP system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. To use this endpoint for bulk verification, organizations must first set up a webhook through their account on the platform. This webhook will serve as the destination for receiving the verification results. If the operation is successful, a structured JSON response with the verification status of each phone number will be automatically sent to the registered webhook, enabling efficient and automated processing.
+**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMS system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. To use this endpoint for bulk verification, organizations must first set up a webhook through their account on the platform. This webhook will serve as the destination for receiving the verification results. If the operation is successful, a structured JSON response with the verification status of each phone number will be automatically sent to the registered webhook, enabling efficient and automated processing.
 
 **Method:** POST  
 **URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/verify/bulk`  
@@ -391,7 +391,7 @@ Only authorized entities can update statuses. Attempts by unauthorized users wil
 
 # Error Handling
 
-TIRMP uses standard HTTP status codes. Below are common responses: {{ className: 'lead' }}
+TIRMS uses standard HTTP status codes. Below are common responses: {{ className: 'lead' }}
 
 - 400 Bad Request: Missing or invalid parameter
 - 401 Unauthorized: Missing or invalid API Key
@@ -410,7 +410,7 @@ TIRMP uses standard HTTP status codes. Below are common responses: {{ className:
 # Frequently Asked Questions (FAQ) {{className: 'mt-10 text-4xl'}}
 
 1. **How do I get an API key?**  
-   API keys can be generated from the TIRMP portal.
+   API keys can be generated from the TIRMS portal.
 
 2. **Can I use the same API key across multiple services?**  
    Yes, but it's best practice to use separate keys for production, testing, and environments requiring different access levels.
@@ -419,7 +419,7 @@ TIRMP uses standard HTTP status codes. Below are common responses: {{ className:
    You should use the MSISDN format based on the E.164 standard (without the + symbol) for all phone numbers in your API requests. You can use 10, 11, or 13 digits.
 
 4. **What does 'Null/Normal' mean in the verification response?**  
-   Null/Normal indicates that the phone number does not fall under any defined status—such as churned, swapped, or blacklisted. It may also mean that the number has not yet been registered or updated in the TIRMP database.
+   Null/Normal indicates that the phone number does not fall under any defined status—such as churned, swapped, or blacklisted. It may also mean that the number has not yet been registered or updated in the TIRMS database.
 
 5. **How frequently is the data updated?**  
    As frequently as possible.

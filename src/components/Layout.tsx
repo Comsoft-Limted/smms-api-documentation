@@ -33,7 +33,7 @@ export function Layout({
                 {/* <img src={logo} /> */}
                 
                 <div className='leading-3 mt-2'>
-                  <div className='font-bold text-2xl'>TIRMP</div>
+                  <div className='font-bold text-2xl'>TIRMS</div>
                   <small className='text-[10px]'>
                     Telecom Identity Risk Management Portal
                   </small>
