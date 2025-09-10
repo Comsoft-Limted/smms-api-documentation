@@ -14,8 +14,7 @@ export const metadata = {
 Before integrating with the TIRMS API, ensure the following requirements are in place: {{ className: 'lead' }}
 
 ## Onboarding and Registration {{ className: 'mt-0'}}
-- Your organization must be registered and approved by the TIRMS system administrator.
-- API access credentials (API key) will be issued upon successful onboarding.
+- Your organization must be registered and approved by the TIRMP system administrator.
 
 ## API Key Generation {{ className: 'mt-0'}}
 
@@ -116,11 +115,12 @@ This endpoint allows authorized users to update the status of a single phone num
 **Phone Number Status Update Request Schema:**
 
 ```json
-{ 
-  "reason": "Number reassigned to new user", 
-  "status": "CHURNED", 
-  "reassignmentDate": "2025-09-02",
-  "occurrenceOfStatusDate": "2025-07-02"
+{
+  "status": "BARRED",
+  "phoneNumber": "07059316841",
+  "reassignmentDate": "2025-09-15",
+  "occurrenceOfStatusDate": "2025-09-15",
+  "remarks": "Number reassigned to new user"
 }
 ```
 
@@ -128,12 +128,14 @@ This endpoint allows authorized users to update the status of a single phone num
 
 ```json
 {
-  "oldStatus": "NORMAL",
-  "newStatus": "CHURNED",
-  "changeReason": "Number reassigned to new user",
-  "phoneNumber": "08012345678",
-  "changedByName": "John Doe",
-  "createdAt": "2025-01-15T13:54:23.021Z"
+    "status": "Success",
+    "data": {
+        "phoneNumber": "07059316841",
+        "status": "BARRED",
+        "updateTimestamp": "2025-09-09 10:20:26",
+        "remarks": "Number reassigned to new user"
+    },
+    "statusCode": "200"
 }
 ```
 
@@ -274,17 +276,13 @@ The request body must be an array of objects, each representing a phone number u
 {
   "status": "Success",
   "data": {
-    "phoneNumber": "0818185039",
     "status": "SWAPPED",
-    "phoneStatus": null,
-    "requestId": "3ddde7f7-e979-4ed6-9e1a-5c947133c887",
-    "remarks": null,
-    "mobileNetwork": "Etisalat",
-    "reassignmentDate": "2025-06-02",
-    "verificationTimestamp": "2025-01-15T13:40:42.524Z",
-    "occurrenceOfStatusDate": "2025-06-01",
-    "errorMessage": null,
-    "user": null
+    "requestId": "ba0f41ee-d58d-44c3-9f18-04d7ecb804f9",
+    "reassignmentDate": null,
+    "verificationTimestamp": "2025-09-09 10:37:33",
+    "occurrenceOfStatusDate": "2025-09-09",
+    "mobileNetwork": "GLOBACOM",
+    "msisdn": "07444009986"
   },
   "statusCode": "200"
 }
@@ -389,6 +387,93 @@ The request body must be an array of objects, each representing a phone number u
 **Important Note:** <br/>
 Only authorized entities can update statuses. Attempts by unauthorized users will result in 403 Forbidden. {{className: 'lead'}}
 
+## Bulk Phone Number Verification – Responses
+
+### 1. Request Accepted
+
+When you submit numbers, the API confirms receipt:
+
+```json
+{
+  "status": "Success",
+  "data": {
+    "message": "Bulk verification request accepted with 3 phone numbers. Track progress at: http://.../batch/96635c1a/verification",
+    "link": "http://.../batch/96635c1a/verification"
+  },
+  "statusCode": "200"
+}
+```
+
+- **status**: outcome of the request (Success if accepted)
+- **data.message**: confirmation text
+- **data.link**: URL to check results later
+- **statusCode**: HTTP code (200 = accepted)
+
+### 2. Verification Results
+
+When you check the link, you get details for each number:
+
+```json
+{
+  "status": "Success",
+  "data": [
+    {
+      "msisdn": "2348012345678",
+      "status": "NORMAL",
+      "requestId": "96635c1a",
+      "reassignmentDate": "2025-08-15",
+      "verificationTimestamp": "2025-08-15T12:34:56.789Z",
+      "occurrenceOfStatusDate": "2025-08-14",
+      "mobileNetwork": "MTN"
+    }
+  ],
+  "statusCode": "200"
+}
+```
+
+- **msisdn**: phone number checked
+- **status**: current state (BLACKLISTED, CHURNED, REASSIGNED, SWAPPED, NORMAL, or NULL)
+- **requestId**: batch ID
+- **reassignmentDate**: date number was reassigned (if any)
+- **verificationTimestamp**: when the check was done
+- **occurrenceOfStatusDate**: date of the status event
+- **mobileNetwork**: operator (e.g., MTN)
+- **statusCode**: HTTP code
+
+**Please note:** Although the response payload confirms whether the bulk request was successfully received, the actual status results for each phone number will be sent separately to the webhook provided by the requesting organization. See below for sample phone number verification responses that will be delivered to the webhook.
+
+```json
+{ 
+  "event": "phone.verification.failed",
+  "data": {
+    "status": "NOT_FOUND",
+    "requestId": "71c0d0b6-ad11-4a12-b86e-7f9db42ee4fc",
+    "reassignmentDate": null,
+    "verificationTimestamp": "2025-01-15T11:36:15.000Z",
+    "occurrenceOfStatusDate": null,
+    "mobileNetwork": "MTN",
+    "msisdn": "08181855634"
+  },
+  "errorMessage": "Phone number record not found"
+}
+```
+
+```json
+{
+  "event": "phone.verification.success",
+  "data": {
+    "status": "CHURNED",
+    "requestId": "388f0644-2dc3-43e4-8064-8162d1092abb",
+    "reassignmentDate": "2025-06-02",
+    "verificationTimestamp": "2025-01-15T08:50:00.000Z",
+    "occurrenceOfStatusDate": "2025-05-23",
+    "mobileNetwork": "Airtel",
+    "msisdn": "07076295624"
+  }
+}
+```
+
+--
 # Error Handling
 
 TIRMS uses standard HTTP status codes. Below are common responses: {{ className: 'lead' }}
