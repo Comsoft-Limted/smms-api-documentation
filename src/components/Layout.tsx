@@ -35,7 +35,7 @@ export function Layout({
                 <div className='leading-3 mt-2'>
                   <div className='font-bold text-2xl'>TIRMS</div>
                   <small className='text-[10px]'>
-                    Telecom Identity Risk Management Portal
+                    Telecom Identity Risk Management System
                   </small>
                 </div>
               </Link>
