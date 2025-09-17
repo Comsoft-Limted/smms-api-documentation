@@ -278,11 +278,13 @@ The request body must be an array of objects, each representing a phone number u
   "data": {
     "status": "SWAPPED",
     "requestId": "ba0f41ee-d58d-44c3-9f18-04d7ecb804f9",
+    "verificationStatus": "VERIFIED",
     "reassignmentDate": null,
     "verificationTimestamp": "2025-09-09 10:37:33",
     "occurrenceOfStatusDate": "2025-09-09",
     "mobileNetwork": "GLOBACOM",
-    "msisdn": "07444009986"
+    "msisdn": "07444009986",
+    "errorMessage": null
   },
   "statusCode": "200"
 }
@@ -319,11 +321,13 @@ The request body must be an array of objects, each representing a phone number u
     {  
       "status": "BLACKLISTED, CHURNED, REASSIGNED, SWAPPED, NORMAL, NULL",  
       "requestId": "string",  
+      "verificationStatus": "VERIFIED",
       "reassignmentDate": "2025-09-03",  
       "verificationTimestamp": "2025-09-03T16:02:32.767Z",  
       "occurrenceOfStatusDate": "2025-09-03",  
       "mobileNetwork": "string",  
-      "msisdn": "string"  
+      "msisdn": "string",
+      "errorMessage": null
     }  
   ],  
   "statusCode": "string"  
@@ -342,138 +346,27 @@ The request body must be an array of objects, each representing a phone number u
     - `NORMAL` → The number is active and valid
     - `NULL` → No status could be determined
   - **requestId (string)** → Unique identifier for the verification request
+  - **verificationStatus (string)** → The status of the phone number verification
+    - `VERIFIED` - The number has been verified successfully
+    - `FAILED` - The number is invalid
   - **reassignmentDate (string, date)** → Date when the number was reassigned (if applicable). Format: `YYYY-MM-DD`
   - **verificationTimestamp (string, timestamp)** → Exact date and time the verification was performed. Format: ISO 8601 (`YYYY-MM-DDTHH:MM:SS.sssZ`)
   - **occurrenceOfStatusDate (string, date)** → Date when the status event occurred (e.g., churn date, blacklist date). Format: `YYYY-MM-DD`
   - **mobileNetwork (string)** → The mobile network operator (e.g., `"MTN"`, `"Airtel"`, `"Glo"`)
   - **msisdn (string)** → The phone number (MSISDN) being verified
+  - **errorMessage (string)** → The error message for failed phone number verification
 - **statusCode (string/integer)** → HTTP status code returned by the API (`200` for success, `400` for bad request, `404` for not found, etc.)
 
 **Please note:** Although the response payload confirms whether the bulk request was successfully received, the actual status results for each phone number will be sent separately to the webhook provided by the requesting organization. See below for sample phone number verification responses that will be delivered to the webhook.
 
-**Webhook Response Examples:**
 
-```json
-{   
-  "event": "phone.verification.failed",  
-  "data": {  
-    "status": "NOT_FOUND",  
-    "requestId": "71c0d0b6-ad11-4a12-b86e-7f9db42ee4fc",  
-    "reassignmentDate": null,  
-    "verificationTimestamp": "2025-01-15T11:36:15.000Z",  
-    "occurrenceOfStatusDate": null,  
-    "mobileNetwork": "MTN",  
-    "msisdn": "08181855634"  
-  },  
-  "errorMessage": "Phone number record not found"  
-}
-```
-
-```json
-{  
-  "event": "phone.verification.success",  
-  "data": {  
-    "status": "CHURNED",  
-    "requestId": "388f0644-2dc3-43e4-8064-8162d1092abb",  
-    "reassignmentDate": "2025-06-02",  
-    "verificationTimestamp": "2025-01-15T08:50:00.000Z",  
-    "occurrenceOfStatusDate": "2025-05-23",  
-    "mobileNetwork": "Airtel",  
-    "msisdn": "07076295624"  
-  }  
-}
-```
 
 **Important Note:** <br/>
 Only authorized entities can update statuses. Attempts by unauthorized users will result in 403 Forbidden. {{className: 'lead'}}
 
-## Bulk Phone Number Verification – Responses
 
-### 1. Request Accepted
 
-When you submit numbers, the API confirms receipt:
 
-```json
-{
-  "status": "Success",
-  "data": {
-    "message": "Bulk verification request accepted with 3 phone numbers. Track progress at: http://.../batch/96635c1a/verification",
-    "link": "http://.../batch/96635c1a/verification"
-  },
-  "statusCode": "200"
-}
-```
-
-- **status**: outcome of the request (Success if accepted)
-- **data.message**: confirmation text
-- **data.link**: URL to check results later
-- **statusCode**: HTTP code (200 = accepted)
-
-### 2. Verification Results
-
-When you check the link, you get details for each number:
-
-```json
-{
-  "status": "Success",
-  "data": [
-    {
-      "msisdn": "2348012345678",
-      "status": "NORMAL",
-      "requestId": "96635c1a",
-      "reassignmentDate": "2025-08-15",
-      "verificationTimestamp": "2025-08-15T12:34:56.789Z",
-      "occurrenceOfStatusDate": "2025-08-14",
-      "mobileNetwork": "MTN"
-    }
-  ],
-  "statusCode": "200"
-}
-```
-
-- **msisdn**: phone number checked
-- **status**: current state (BLACKLISTED, CHURNED, REASSIGNED, SWAPPED, NORMAL, or NULL)
-- **requestId**: batch ID
-- **reassignmentDate**: date number was reassigned (if any)
-- **verificationTimestamp**: when the check was done
-- **occurrenceOfStatusDate**: date of the status event
-- **mobileNetwork**: operator (e.g., MTN)
-- **statusCode**: HTTP code
-
-**Please note:** Although the response payload confirms whether the bulk request was successfully received, the actual status results for each phone number will be sent separately to the webhook provided by the requesting organization. See below for sample phone number verification responses that will be delivered to the webhook.
-
-```json
-{ 
-  "event": "phone.verification.failed",
-  "data": {
-    "status": "NOT_FOUND",
-    "requestId": "71c0d0b6-ad11-4a12-b86e-7f9db42ee4fc",
-    "reassignmentDate": null,
-    "verificationTimestamp": "2025-01-15T11:36:15.000Z",
-    "occurrenceOfStatusDate": null,
-    "mobileNetwork": "MTN",
-    "msisdn": "08181855634"
-  },
-  "errorMessage": "Phone number record not found"
-}
-```
-
-```json
-{
-  "event": "phone.verification.success",
-  "data": {
-    "status": "CHURNED",
-    "requestId": "388f0644-2dc3-43e4-8064-8162d1092abb",
-    "reassignmentDate": "2025-06-02",
-    "verificationTimestamp": "2025-01-15T08:50:00.000Z",
-    "occurrenceOfStatusDate": "2025-05-23",
-    "mobileNetwork": "Airtel",
-    "msisdn": "07076295624"
-  }
-}
-```
-
---
 # Error Handling
 
 TIRMS uses standard HTTP status codes. Below are common responses: {{ className: 'lead' }}
