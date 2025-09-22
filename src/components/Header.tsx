@@ -91,7 +91,7 @@ export const Header = forwardRef<
           <ThemeToggle />
         </div>
         <div className="hidden min-[416px]:contents">
-          <Button href="https://tirmp.comsoftltd.net">Sign in</Button>
+          <Button href="https://tirms.ncc.gov.ng">Sign in</Button>
         </div>
       </div>
     </motion.div>

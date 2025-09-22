@@ -21,9 +21,18 @@ Before integrating with the TIRMS API, ensure the following requirements are in 
 - An administrator from your organization must log on to TIRMS to generate an API key.
 - Keep this key secure; it will be used in the Authorization header for every API request.
 
-## Webhook Setup (for Bulk Verification) {{ className: 'mt-0'}}
+## Webhook Setup (for phone number status update) {{ className: 'mt-0'}}
 
-- If you intend to use the bulk verification endpoint, set up a secure and accessible webhook URL to receive asynchronous results. The webhook can be configured via the TIRMS platform.
+Note: This feature is available only to registered organizations using TIRMS.
+
+If you want to receive notifications when a phone number previously verified by your organization undergoes a status change, we recommend setting up a webhook. Once configured, any status updates for numbers your organization has verified—such as a change from "BARRED" to "CHURNED"—will be automatically sent to the registered webhook URL. To set up a webhook for receiving updates on phone number statuses, please follow the steps below.
+
+**Steps:**
+- On TIRMS, navigate to the API Integration page through the main navigation menu.
+- Locate and click the "Add a webhook" button to initiate the webhook creation process.
+- Specify the Webhook URL in the designated field (this is the secure endpoint where our system will send detailed event data and notifications).
+- From the available options, carefully select the specific Events that should trigger your webhook. You can choose multiple events to monitor different types of system activities.
+- Click "Add webhook" to finalize and activate your webhook configuration.
 
 ## MSISDN Format Compliance {{ className: 'mt-0'}}
 
@@ -37,7 +46,8 @@ Before integrating with the TIRMS API, ensure the following requirements are in 
 ## Base URL {{ className: 'mt-0'}}
 
 - All endpoints must be accessed via the following base URL:
-  **Production:** `https://tirmp.comsoftltd.net/api/v1/phone/api`
+  **Production:** `https://tirms.ncc.gov.ng/api/v1/phone/api`
+
 
 ## Upload Restrictions {{ className: 'mt-0'}}
 
@@ -103,7 +113,7 @@ Authorization: Bearer <API Key>
 This endpoint allows authorized users to update the status of a single phone number in the system. It is typically used by telecom operators or designated entities to record changes such as churn, swap, blacklist, or reassignment events.
 
 **Method:** PUT  
-**URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/status`  
+**URL:** `https://tirms.ncc.gov.ng/api/v1/phone/api/phone-numbers/status`  
 **Authentication:** Bearer (API key)
 
 **When to Use:**
@@ -146,7 +156,7 @@ Allows authorized users to update the status of multiple phone numbers.
 **Purpose:** This endpoint allows authorized operators (telecom providers or other designated entities) to update the status of multiple phone numbers at once in the TIRMS system. For example, suppose several numbers become churned, swapped, or blacklisted. In that case, the operator can submit those updates in bulk to ensure accurate and up-to-date records for downstream service providers.
 
 **Method:** PUT  
-**URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/status/bulk`  
+**URL:** `https://tirms.ncc.gov.ng/api/v1/phone/api/phone-numbers/status/bulk`  
 **Authentication:** Bearer (API key)
 
 **Request Format**
@@ -167,7 +177,7 @@ The request body must be an array of objects, each representing a phone number u
 **Sample Request Payload:**
 
 ```json
-{
+[{
   "status": "CHURNED",
   "phoneNumber": "09012345678",
   "reassignmentDate": "2025-09-15",
@@ -180,7 +190,7 @@ The request body must be an array of objects, each representing a phone number u
   "reassignmentDate": "2025-09-02",
   "occurrenceOfStatusDate": "2025-09-06",
   "remarks": "SIM card replaced due to damage"
-}
+}]
 ```
 
 **Sample Response:**
@@ -207,7 +217,7 @@ The request body must be an array of objects, each representing a phone number u
 **Purpose:** This endpoint allows telecom operators to seamlessly upload multiple phone numbers via API integration, enabling smooth interoperability with their legacy systems.
 
 **Method:** POST  
-**URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/upload/bulk`  
+**URL:** `https://tirms.ncc.gov.ng/api/v1/phone/api/phone-numbers/upload/bulk`  
 **Authentication:** Bearer (API key)
 
 **Sample Request:**
@@ -242,9 +252,13 @@ The request body must be an array of objects, each representing a phone number u
 ```json
 {
   "status": "string",
-  "data": "string",
+  "data": {
+    "message":"string",
+    "link":"string"
+  },
   "statusCode": "string"
 }
+
 ```
 
 ## Service Provider Endpoints (Fintechs, Banks, etc.)
@@ -254,7 +268,7 @@ The request body must be an array of objects, each representing a phone number u
 **Purpose:** These endpoints are accessible to registered organizations for verifying the current status of phone numbers. Before a service provider onboards a user or allows them to perform sensitive operations—such as opening an account, initiating transactions, or resetting passwords—they should confirm that the phone number is both safe and currently owned by the user. This verification step helps detect cases where a number may have been recently churned, blacklisted, or swapped, thereby reducing the risk of fraud or unauthorized access.
 
 **Method:** POST  
-**URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/verify`  
+**URL:** `https://tirms.ncc.gov.ng/api/v1/phone/api/phone-numbers/verify`  
 **Authentication:** Bearer (API key)
 
 **When to Use:**
@@ -292,10 +306,12 @@ The request body must be an array of objects, each representing a phone number u
 
 ### Phone Number Status Verification (Bulk)
 
-**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMS system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. To use this endpoint for bulk verification, organizations must first set up a webhook through their account on the platform. This webhook will serve as the destination for receiving the verification results. If the operation is successful, a structured JSON response with the verification status of each phone number will be automatically sent to the registered webhook, enabling efficient and automated processing.
+**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMP system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. 
+
+Please note: Each request is limited to a maximum of 500 phone numbers.
 
 **Method:** POST  
-**URL:** `https://tirmp.comsoftltd.net/api/v1/phone/api/phone-numbers/verify/bulk`  
+**URL:** `https://tirms.ncc.gov.ng/api/v1/phone/api/phone-numbers/verify/bulk`  
 **Authentication:** Bearer (API key)
 
 **Sample Request Payload:**
@@ -406,7 +422,7 @@ TIRMS uses standard HTTP status codes. Below are common responses: {{ className:
    If you attempt to update the status of a phone number that you are not authorized to manage, the system will reject the request and return an authorization error. Only registered telecom operators can update numbers within their allocated ranges. Unauthorized access attempts are logged and monitored for security and compliance purposes.
 
 7. **Is batch verification supported?**  
-   Yes, batch verification is supported via the Bulk Verification endpoint. Organizations can submit multiple phone numbers in a single request. While the API will acknowledge receipt of the request, the verification results for each number will be sent asynchronously to the webhook provided by the requesting organization.
+   Yes, batch verification is supported via the Bulk Verification endpoint. Organizations can submit multiple phone numbers in a single request. While the API will acknowledge receipt of the request, the verification results for each number will be sent to the link in the response.
 
 8. **What should I do when I hit the rate limit?**  
    If you hit the rate limit (429 error), wait before retrying.

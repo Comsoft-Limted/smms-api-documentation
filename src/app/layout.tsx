@@ -9,8 +9,11 @@ import '@/styles/tailwind.css'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - Protocol API Reference',
-    default: 'Protocol API Reference',
+    template: '%s - TIRMS API Reference',
+    default: 'TIRMS API Reference',
+  },
+  icons: {
+    icon: { url: 'https://tirms.ncc.gov.ng/images/logos/app-logo.svg', type: 'image/svg+xml' },
   },
 }
 
