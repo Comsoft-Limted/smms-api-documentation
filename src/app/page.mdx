@@ -14,7 +14,7 @@ export const metadata = {
 Before integrating with the TIRMS API, ensure the following requirements are in place: {{ className: 'lead' }}
 
 ## Onboarding and Registration {{ className: 'mt-0'}}
-- Your organization must be registered and approved by the TIRMP system administrator.
+- Your organization must be registered and approved by the TIRMS system administrator.
 
 ## API Key Generation {{ className: 'mt-0'}}
 
@@ -51,7 +51,7 @@ If you want to receive notifications when a phone number previously verified by 
 
 ## Upload Restrictions {{ className: 'mt-0'}}
 
-- The maximum upload size for bulk requests is **100,000 records**.
+- The maximum size for the bulk of phone numbers and bulk updates is **100,000 records**.
 
 ## Development Team Familiarity {{ className: 'mt-0'}}
 
@@ -306,7 +306,7 @@ The request body must be an array of objects, each representing a phone number u
 
 ### Phone Number Status Verification (Bulk)
 
-**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMP system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. 
+**Purpose:** This endpoint allows organizations—such as fintechs, banks, and other institutions—to verify multiple phone numbers at once within the TIRMS system. It is designed for seamless integration into legacy systems, enabling background verification of phone numbers without disrupting existing business processes. 
 
 Please note: Each request is limited to a maximum of 500 phone numbers.
 
@@ -372,15 +372,6 @@ Please note: Each request is limited to a maximum of 500 phone numbers.
   - **msisdn (string)** → The phone number (MSISDN) being verified
   - **errorMessage (string)** → The error message for failed phone number verification
 - **statusCode (string/integer)** → HTTP status code returned by the API (`200` for success, `400` for bad request, `404` for not found, etc.)
-
-**Please note:** Although the response payload confirms whether the bulk request was successfully received, the actual status results for each phone number will be sent separately to the webhook provided by the requesting organization. See below for sample phone number verification responses that will be delivered to the webhook.
-
-
-
-**Important Note:** <br/>
-Only authorized entities can update statuses. Attempts by unauthorized users will result in 403 Forbidden. {{className: 'lead'}}
-
-
 
 
 # Error Handling
