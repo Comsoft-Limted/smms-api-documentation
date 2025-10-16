@@ -57,7 +57,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 - `.dockerignore`: Optimized build context
 
 ### Next.js Configuration
-- `next.config.mjs`: Standard Next.js configuration without basePath (nginx handles path rewriting)
+- `next.config.mjs`: Configured with `basePath: '/docs'` and `assetPrefix: '/docs'` for proper subpath serving
 
 ### Deployment Scripts
 - `setup-server.sh`: Server directory initialization
@@ -67,7 +67,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 ### Nginx Configuration
 - Reverse proxy configuration in `ui/scripts/setup-ssl.sh`
 - HTTP-only configuration in `ui/scripts/configure-nginx.sh`
-- Configured to strip `/docs/` prefix and proxy to `http://localhost:3003/` using rewrite rules
+- Configured to pass full path including `/docs` to `http://localhost:3003` without modification
 
 ## Environment Variables
 

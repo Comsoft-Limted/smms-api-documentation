@@ -1,4 +1,4 @@
-# Next.js Nginx Reverse Proxy Configuration
+# Next.js Nginx Reverse Proxy Configuration with basePath
 
 ## Problem
 
@@ -11,34 +11,37 @@ When Next.js is served behind an nginx reverse proxy at a subpath (e.g., `/docs/
 
 ## Solution
 
-### Approach: Use Nginx Rewrite (No basePath needed)
+### Approach: Use Next.js basePath + assetPrefix
 
-We use nginx to handle the path rewriting without modifying Next.js configuration.
+Configure Next.js to know it's being served from a subpath, and configure nginx to pass the full path without modification.
 
-### 1. Keep Next.js Standard Configuration
+### 1. Configure Next.js with basePath and assetPrefix
 
 **File: `next.config.mjs`**
 
 ```js
 const nextConfig = {
+  basePath: '/docs',
+  assetPrefix: '/docs',
   output: "standalone",
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
-  // ... rest of config (NO basePath needed)
+  // ... rest of config
 }
 ```
 
 **What this does:**
-- Next.js generates standard asset paths: `/_next/static/css/xyz.css`
-- No special configuration needed in Next.js
-- Simpler and more maintainable
+- `basePath: '/docs'` - Tells Next.js it's served from `/docs` path
+- `assetPrefix: '/docs'` - Prefixes ALL assets with `/docs`
+- Next.js generates asset paths as: `/docs/_next/static/css/xyz.css`
+- All internal links automatically include `/docs` prefix
 
-### 2. Configure Nginx Reverse Proxy with Rewrite
+### 2. Configure Nginx to Pass Full Path
 
 **Files: `ui/scripts/setup-ssl.sh` and `ui/scripts/configure-nginx.sh`**
 
 ```nginx
-location /docs/ {
-    proxy_pass http://localhost:3003/;
+location /docs {
+    proxy_pass http://localhost:3003;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header Upgrade $http_upgrade;
@@ -46,18 +49,34 @@ location /docs/ {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-    rewrite ^/docs/(.*)$ /$1 break;
 }
 ```
 
-**What this does:**
-- Strips `/docs/` prefix before sending to Next.js
-- Next.js receives clean paths like `/`, `/_next/static/...`
-- All assets load correctly through the proxy
+**Important details:**
+- `location /docs` (no trailing slash) - Matches both `/docs` and `/docs/*`
+- `proxy_pass http://localhost:3003` (no trailing slash or path) - Passes full URI including `/docs`
+- NO rewrite directive - Path is preserved as-is
 
 ## How It Works
 
 ### Request Flow:
+
+1. **Browser requests:** `https://domain.com/docs/`
+2. **Nginx matches:** `location /docs`
+3. **Nginx proxies to:** `http://localhost:3003/docs/` (full path preserved)
+4. **Next.js receives:** `/docs/` (matches basePath)
+5. **Next.js renders page with asset paths:** `/docs/_next/static/css/xyz.css`
+6. **Browser requests asset:** `https://domain.com/docs/_next/static/css/xyz.css`
+7. **Nginx matches:** `location /docs` (again)
+8. **Nginx proxies to:** `http://localhost:3003/docs/_next/static/css/xyz.css`
+9. **Next.js serves asset:** ✅ Success!
+
+### Key Points:
+
+- **basePath + assetPrefix in Next.js** = All paths include `/docs` prefix
+- **Nginx passes full path** = Don't modify the URI, pass it as-is to Next.js
+- **No trailing slashes** = Important for nginx proxy_pass behavior
+- **Both must match** = basePath must match the nginx location path
 
 1. **Browser requests:** `https://domain.com/docs/`
 2. **Nginx matches:** `location /docs/`
