@@ -56,6 +56,9 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 - `docker-compose.yml`: Local development setup
 - `.dockerignore`: Optimized build context
 
+### Next.js Configuration
+- `next.config.mjs`: Configured with `basePath: '/docs'` for proper asset loading behind reverse proxy
+
 ### Deployment Scripts
 - `setup-server.sh`: Server directory initialization
 - `deploy-container.sh`: Container deployment and management
@@ -64,6 +67,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 ### Nginx Configuration
 - Reverse proxy configuration in `ui/scripts/setup-ssl.sh`
 - HTTP-only configuration in `ui/scripts/configure-nginx.sh`
+- Configured to pass requests to `http://localhost:3003/docs/` preserving the `/docs/` path
 
 ## Environment Variables
 
