@@ -1,0 +1,116 @@
+name: Deploy Documentation to Bare Metal Server
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+
+env:
+    NODE_VERSION: "18"
+    APP_NAME: tirmps-docs
+    DEPLOY_PATH: /var/www/tirmps-docs
+    CONTAINER_NAME: tirmps-docs
+    IMAGE_NAME: tirmps-docs
+    IMAGE_TAG: latest
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build Docker image
+              run: |
+                  echo "🐳 Building Docker image..."
+                  docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+                  echo "✅ Docker image built successfully"
+
+            - name: Save Docker image
+              run: |
+                  echo "💾 Saving Docker image to archive..."
+                  docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip > deploy-image.tar.gz
+                  echo "✅ Docker image saved successfully"
+                  ls -lh deploy-image.tar.gz
+
+            - name: Copy deployment scripts to server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  source: "./scripts/*"
+                  target: "/tmp/"
+                  strip_components: 1
+
+            - name: Copy Docker image to server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  source: "./deploy-image.tar.gz"
+                  target: "/tmp/"
+
+            - name: Setup server directories
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  script: |
+                      sudo chmod +x /tmp/setup-server.sh
+                      sudo env DEPLOY_PATH="${{ env.DEPLOY_PATH }}" \
+                      USERNAME="${{ secrets.USERNAME }}" \
+                      /tmp/setup-server.sh
+
+            - name: Deploy Docker container
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  script: |
+                      sudo chmod +x /tmp/deploy-container.sh
+                      sudo env DEPLOY_PATH="${{ env.DEPLOY_PATH }}" \
+                      IMAGE_ARCHIVE="/tmp/deploy-image.tar.gz" \
+                      IMAGE_NAME="${{ env.IMAGE_NAME }}" \
+                      IMAGE_TAG="${{ env.IMAGE_TAG }}" \
+                      CONTAINER_NAME="${{ env.CONTAINER_NAME }}" \
+                      /tmp/deploy-container.sh
+
+            - name: Verify deployment
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  script: |
+                      sudo chmod +x /tmp/verify-deployment.sh
+                      sudo env DEPLOY_PATH="${{ env.DEPLOY_PATH }}" \
+                      CONTAINER_NAME="${{ env.CONTAINER_NAME }}" \
+                      /tmp/verify-deployment.sh
+
+            - name: Cleanup temporary files
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  script: |
+                      echo "🧹 Cleaning up temporary files"
+                      rm -f /tmp/setup-server.sh
+                      rm -f /tmp/deploy-container.sh
+                      rm -f /tmp/verify-deployment.sh
+                      rm -f /tmp/deploy-image.tar.gz
+                      echo "✅ Cleanup completed"
