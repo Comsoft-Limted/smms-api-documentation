@@ -1,4 +1,4 @@
-# Next.js BasePath Configuration for Nginx Reverse Proxy
+# Next.js Nginx Reverse Proxy Configuration
 
 ## Problem
 
@@ -11,41 +11,34 @@ When Next.js is served behind an nginx reverse proxy at a subpath (e.g., `/docs/
 
 ## Solution
 
-### 1. Configure Next.js BasePath
+### Approach: Use Nginx Rewrite (No basePath needed)
+
+We use nginx to handle the path rewriting without modifying Next.js configuration.
+
+### 1. Keep Next.js Standard Configuration
 
 **File: `next.config.mjs`**
 
 ```js
 const nextConfig = {
-  basePath: '/docs',  // ← Add this line
   output: "standalone",
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
-  // ... rest of config
+  // ... rest of config (NO basePath needed)
 }
 ```
 
 **What this does:**
-- Next.js now prefixes all asset paths with `/docs`
-- Assets load as: `/docs/_next/static/css/xyz.css`
-- All internal links and navigation include the basePath automatically
+- Next.js generates standard asset paths: `/_next/static/css/xyz.css`
+- No special configuration needed in Next.js
+- Simpler and more maintainable
 
-### 2. Update Nginx Reverse Proxy
+### 2. Configure Nginx Reverse Proxy with Rewrite
 
 **Files: `ui/scripts/setup-ssl.sh` and `ui/scripts/configure-nginx.sh`**
 
-**Before (incorrect):**
 ```nginx
 location /docs/ {
-    proxy_pass http://localhost:3003/;  # ← Strips /docs/ prefix
-    # ...
-    rewrite ^/docs/(.*)$ /$1 break;     # ← Removes /docs/ from path
-}
-```
-
-**After (correct):**
-```nginx
-location /docs/ {
-    proxy_pass http://localhost:3003/docs/;  # ← Preserves /docs/ prefix
+    proxy_pass http://localhost:3003/;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header Upgrade $http_upgrade;
@@ -53,14 +46,14 @@ location /docs/ {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-    # No rewrite needed - path is preserved
+    rewrite ^/docs/(.*)$ /$1 break;
 }
 ```
 
-**What changed:**
-- `proxy_pass` now includes `/docs/` at the end
-- Removed the `rewrite` directive
-- Path is preserved and passed to Next.js exactly as received
+**What this does:**
+- Strips `/docs/` prefix before sending to Next.js
+- Next.js receives clean paths like `/`, `/_next/static/...`
+- All assets load correctly through the proxy
 
 ## How It Works
 
