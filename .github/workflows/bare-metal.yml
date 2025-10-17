@@ -12,6 +12,8 @@ env:
     CONTAINER_NAME: tirmps-docs
     IMAGE_NAME: tirmps-docs
     IMAGE_TAG: latest
+    DOMAIN_NAME: docs.tirms.ncc.gov.ng
+    NGINX_SITE_NAME: tirmps-docs
 
 jobs:
     build-and-deploy:
@@ -87,6 +89,50 @@ jobs:
                       CONTAINER_NAME="${{ env.CONTAINER_NAME }}" \
                       /tmp/deploy-container.sh
 
+            - name: Configure Nginx for Documentation
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  script: |
+                      # Install nginx and certbot if not already installed
+                      echo "📦 Installing required packages..."
+                      while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+                          echo "⏳ Waiting for apt lock to be released..."
+                          sleep 5
+                      done
+                      sudo apt update
+                      sudo apt install -y nginx certbot python3-certbot-nginx
+                      
+                      # Configure nginx for documentation
+                      echo "🔧 Configuring nginx for documentation..."
+                      sudo chmod +x /tmp/configure-docs-nginx.sh
+                      sudo env NGINX_SITE_NAME="${{ env.NGINX_SITE_NAME }}" \
+                      DOMAIN_NAME="${{ env.DOMAIN_NAME }}" \
+                      /tmp/configure-docs-nginx.sh
+
+            - name: Setup SSL for Documentation
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  port: ${{ secrets.PORT || 22 }}
+                  script: |
+                      # Configure SSL if domain is provided
+                      if [ -n "${{ env.DOMAIN_NAME }}" ] && [ "${{ env.DOMAIN_NAME }}" != "_" ]; then
+                          echo "🔐 Configuring SSL for documentation..."
+                          sudo chmod +x /tmp/setup-docs-ssl.sh
+                          sudo env NGINX_SITE_NAME="${{ env.NGINX_SITE_NAME }}" \
+                          DOMAIN_NAME="${{ env.DOMAIN_NAME }}" \
+                          SSL_EMAIL="${{ secrets.SSL_EMAIL }}" \
+                          /tmp/setup-docs-ssl.sh
+                      else
+                          echo "ℹ️  No domain provided, skipping SSL configuration"
+                      fi
+
             - name: Verify deployment
               uses: appleboy/ssh-action@v1.0.3
               with:
@@ -98,6 +144,7 @@ jobs:
                       sudo chmod +x /tmp/verify-deployment.sh
                       sudo env DEPLOY_PATH="${{ env.DEPLOY_PATH }}" \
                       CONTAINER_NAME="${{ env.CONTAINER_NAME }}" \
+                      DOMAIN_NAME="${{ env.DOMAIN_NAME }}" \
                       /tmp/verify-deployment.sh
 
             - name: Cleanup temporary files
@@ -112,5 +159,7 @@ jobs:
                       rm -f /tmp/setup-server.sh
                       rm -f /tmp/deploy-container.sh
                       rm -f /tmp/verify-deployment.sh
+                      rm -f /tmp/configure-docs-nginx.sh
+                      rm -f /tmp/setup-docs-ssl.sh
                       rm -f /tmp/deploy-image.tar.gz
                       echo "✅ Cleanup completed"
