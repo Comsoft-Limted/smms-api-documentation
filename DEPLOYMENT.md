@@ -11,7 +11,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 - **Container**: `tirmps-docs:latest` running on port 3003
 - **Network**: `documentation-network` (Docker bridge network)
 - **Deploy Path**: `/var/www/tirmps-docs/`
-- **Subdomain**: `docs.tirms.ncc.gov.ng` with dedicated nginx site
+- **Subdomain**: `doc.tirms.ncc.gov.ng` with dedicated nginx site
 - **SSL**: Separate Let's Encrypt certificate for documentation subdomain
 
 ## Deployment Process
@@ -22,7 +22,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 2. Docker image is built on GitHub runner
 3. Image is saved and transferred to server
 4. Server loads image and runs container
-5. Nginx is configured for `docs.tirms.ncc.gov.ng` subdomain
+5. Nginx is configured for `doc.tirms.ncc.gov.ng` subdomain
 6. SSL certificate is obtained for the subdomain
 7. Health checks verify deployment
 
@@ -70,7 +70,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 ### Nginx Configuration
 - Dedicated site configuration in `scripts/configure-docs-nginx.sh`
 - SSL configuration in `scripts/setup-docs-ssl.sh`
-- Separate nginx site for `docs.tirms.ncc.gov.ng` subdomain
+- Separate nginx site for `doc.tirms.ncc.gov.ng` subdomain
 
 ## Environment Variables
 
@@ -82,7 +82,7 @@ The documentation is deployed as a Docker container on port 3003 and accessible 
 
 - Container health check: `curl -f http://localhost:3003/api/health`
 - Documentation endpoint: `http://localhost:3003/`
-- Public access: `https://docs.tirms.ncc.gov.ng`
+- Public access: `https://doc.tirms.ncc.gov.ng`
 
 ## Monitoring
 
@@ -104,7 +104,7 @@ docker stats tirmps-docs
 curl http://localhost:3003/
 
 # Test public endpoint
-curl https://docs.tirms.ncc.gov.ng/
+curl https://doc.tirms.ncc.gov.ng/
 ```
 
 ## Troubleshooting

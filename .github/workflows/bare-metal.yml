@@ -12,7 +12,7 @@ env:
     CONTAINER_NAME: tirmps-docs
     IMAGE_NAME: tirmps-docs
     IMAGE_TAG: latest
-    DOMAIN_NAME: docs.tirms.ncc.gov.ng
+    DOMAIN_NAME: doc.tirms.ncc.gov.ng
     NGINX_SITE_NAME: tirmps-docs
 
 jobs:

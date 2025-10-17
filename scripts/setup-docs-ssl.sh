@@ -3,7 +3,7 @@ set -e
 
 # Configuration
 NGINX_SITE_NAME="${NGINX_SITE_NAME:-tirmps-docs}"
-DOMAIN_NAME="${DOMAIN_NAME:-docs.tirms.ncc.gov.ng}"
+DOMAIN_NAME="${DOMAIN_NAME:-doc.tirms.ncc.gov.ng}"
 SSL_EMAIL="${SSL_EMAIL}"
 CONTAINER_PORT="${CONTAINER_PORT:-3003}"
 
